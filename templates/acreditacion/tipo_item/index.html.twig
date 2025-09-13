@@ -1,0 +1,43 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}TipoItem index{% endblock %}
+
+{% block body %}
+    <h1>TipoItem index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Descripcion</th>
+                <th>CreatedBy</th>
+                <th>CreatedAt</th>
+                <th>UpdateBy</th>
+                <th>UpdatedAt</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for tipo_item in tipo_items %}
+            <tr>
+                <td>{{ tipo_item.id }}</td>
+                <td>{{ tipo_item.descripcion }}</td>
+                <td>{{ tipo_item.createdBy }}</td>
+                <td>{{ tipo_item.createdAt ? tipo_item.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ tipo_item.updateBy }}</td>
+                <td>{{ tipo_item.updatedAt ? tipo_item.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
+                <td>
+                    <a href="{{ path('acreditacion_tipo_item_show', {'id': tipo_item.id}) }}">show</a>
+                    <a href="{{ path('acreditacion_tipo_item_edit', {'id': tipo_item.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="7">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('acreditacion_tipo_item_new') }}">Create new</a>
+{% endblock %}

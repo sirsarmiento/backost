@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}New TipoItem{% endblock %}
+
+{% block body %}
+    <h1>Create new TipoItem</h1>
+
+    {{ include('acreditacion_tipo_item/_form.html.twig') }}
+
+    <a href="{{ path('acreditacion_tipo_item_index') }}">back to list</a>
+{% endblock %}

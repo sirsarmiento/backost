@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "@thiagoprz/ionic-input-mask": "^0.0.5"
+  }
+}
