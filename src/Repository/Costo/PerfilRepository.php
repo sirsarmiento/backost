@@ -176,4 +176,124 @@ class PerfilRepository extends ServiceEntityRepository
             ], 500);
         }
     }
+
+    /**
+     * Update Perfil Empresa.
+     */
+    public function update(int $id, $data, $validator, $helper): JsonResponse
+    {
+        $entityManager = $this->getEntityManager();
+
+        try {
+            // Buscar el perfil existente
+            $perfil = $this->find($id);
+            
+            if (!$perfil) {
+                return new JsonResponse(['msg' => 'Perfil no encontrado'], 404);
+            }
+
+            // Actualizar entidad principal
+            $perfil = $helper->setParametersToEntity($perfil, $data);
+            
+            // Validar entidad principal
+            $errors = $validator->validate($perfil);
+            if ($errors->count() > 0) {
+                $errorMessages = [];
+                foreach ($errors as $error) {
+                    $errorMessages[$error->getPropertyPath()] = $error->getMessage();
+                }
+                
+                return new JsonResponse([
+                    'msg' => 'Errores de validación',
+                    'errors' => $errorMessages
+                ], 422);
+            }
+
+            // Obtener usuario actual para auditoría
+            $currentUser = $entityManager->getRepository(User::class)
+                ->find($this->security->getUser()->getId());
+
+            if ($currentUser) {
+                $perfil->setUpdateBy($currentUser->getUserName());
+                $perfil->setUpdateAt(new \DateTime());
+            }
+
+            // Procesar parámetros si existen
+            if (isset($data['parametros']) && is_array($data['parametros'])) {
+                $this->updateParameters($perfil, $data['parametros'], $entityManager, $validator);
+            }
+            
+            // Persistir y flush
+            $entityManager->flush();
+            
+            return new JsonResponse([
+                'msg' => 'Registro actualizado exitosamente',
+                'id' => $perfil->getId()
+            ], 200);
+            
+        } catch (\Exception $e) {
+            return new JsonResponse([
+                'msg' => 'Error interno del servidor',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    private function updateParameters(Perfil $perfil, array $parametros, EntityManagerInterface $em, $validator): void
+    {
+        // Obtener parámetros existentes
+        $existingParametros = $perfil->getParametros();
+        $existingParametrosMap = [];
+        
+        foreach ($existingParametros as $parametro) {
+            $existingParametrosMap[$parametro->getId()] = $parametro;
+        }
+
+        $parametrosToKeep = [];
+        
+        foreach ($parametros as $parametroData) {
+            try {
+                $parametroId = $parametroData['id'] ?? null;
+                
+                if ($parametroId && isset($existingParametrosMap[$parametroId])) {
+                    // Actualizar parámetro existente
+                    $parametro = $existingParametrosMap[$parametroId];
+                    unset($existingParametrosMap[$parametroId]);
+                } else {
+                    // Crear nuevo parámetro
+                    $parametro = new Parametro();
+                    $parametro->setPerfil($perfil);
+                    $em->persist($parametro);
+                }
+                
+                // Actualizar datos del parámetro
+                $parametro->setTipo($parametroData['tipo'] ?? null);
+                $parametro->setDescripcion($parametroData['descripcion'] ?? null);
+                $parametro->setUnidad($parametroData['unidad'] ?? null);
+                $parametro->setProdMaxHoras($parametroData['prodMaxHoras'] ?? null);
+                $parametro->setHorasMax($parametroData['horasMax'] ?? null);
+                $parametro->setHorasUso($parametroData['horasUso'] ?? null);
+                
+                // Validar parámetro
+                $parametroErrors = $validator->validate($parametro);
+                if ($parametroErrors->count() > 0) {
+                    $errorMessages = [];
+                    foreach ($parametroErrors as $error) {
+                        $errorMessages[$error->getPropertyPath()] = $error->getMessage();
+                    }
+                    throw new \RuntimeException('Parámetro inválido: ' . json_encode($errorMessages));
+                }
+                
+                $parametrosToKeep[] = $parametro->getId();
+                
+            } catch (\Exception $e) {
+                throw new \RuntimeException('Error procesando parámetro: ' . $e->getMessage());
+            }
+        }
+        
+        // Eliminar parámetros que ya no están en la lista
+        foreach ($existingParametrosMap as $parametroToDelete) {
+            $em->remove($parametroToDelete);
+        }
+    }
 }

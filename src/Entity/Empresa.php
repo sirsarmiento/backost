@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Entity\Costo\Perfil;
+use App\Entity\Costo\Producto;
 use App\Entity\Status;
 use App\Repository\EmpresaRepository;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -62,9 +63,15 @@ class Empresa
      */
     private $perfil;
 
+    /**
+     * @ORM\OneToMany(targetEntity=Producto::class, mappedBy="empresa")
+     */
+    private $productos;
+
     public function __construct()
     {
         $this->perfil = new ArrayCollection();
+        $this->productos = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -180,6 +187,36 @@ class Empresa
             // set the owning side to null (unless already changed)
             if ($perfil->getEmpresa() === $this) {
                 $perfil->setEmpresa(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Producto[]
+     */
+    public function getProductos(): Collection
+    {
+        return $this->productos;
+    }
+
+    public function addProducto(Producto $producto): self
+    {
+        if (!$this->productos->contains($producto)) {
+            $this->productos[] = $producto;
+            $producto->setEmpresa($this);
+        }
+
+        return $this;
+    }
+
+    public function removeProducto(Producto $producto): self
+    {
+        if ($this->productos->removeElement($producto)) {
+            // set the owning side to null (unless already changed)
+            if ($producto->getEmpresa() === $this) {
+                $producto->setEmpresa(null);
             }
         }
 
