@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Entity\Costo\Costo;
 use App\Entity\Costo\Perfil;
 use App\Entity\Costo\Producto;
 use App\Entity\Status;
@@ -68,10 +69,16 @@ class Empresa
      */
     private $productos;
 
+    /**
+     * @ORM\OneToMany(targetEntity=Costo::class, mappedBy="empresa")
+     */
+    private $costos;
+
     public function __construct()
     {
         $this->perfil = new ArrayCollection();
         $this->productos = new ArrayCollection();
+        $this->costos = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -217,6 +224,36 @@ class Empresa
             // set the owning side to null (unless already changed)
             if ($producto->getEmpresa() === $this) {
                 $producto->setEmpresa(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Costo[]
+     */
+    public function getCostos(): Collection
+    {
+        return $this->costos;
+    }
+
+    public function addCosto(Costo $costo): self
+    {
+        if (!$this->costos->contains($costo)) {
+            $this->costos[] = $costo;
+            $costo->setEmpresa($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCosto(Costo $costo): self
+    {
+        if ($this->costos->removeElement($costo)) {
+            // set the owning side to null (unless already changed)
+            if ($costo->getEmpresa() === $this) {
+                $costo->setEmpresa(null);
             }
         }
 

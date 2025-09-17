@@ -3,15 +3,13 @@
 namespace App\Entity\Costo;
 
 use App\Entity\Empresa;
-use App\Repository\Costo\ProductoRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
+use App\Repository\Costo\CostoRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Entity(repositoryClass=ProductoRepository::class)
+ * @ORM\Entity(repositoryClass=CostoRepository::class)
  */
-class Producto
+class Costo
 {
     /**
      * @ORM\Id
@@ -21,19 +19,19 @@ class Producto
     private $id;
 
     /**
-     * @ORM\Column(type="string", length=255)
-     */
-    private $nombre;
-
-    /**
-     * @ORM\Column(type="string", length=50, nullable=true)
-     */
-    private $sku;
-
-    /**
      * @ORM\Column(type="string", length=50)
      */
-    private $medida;
+    private $tipo;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $concepto;
+
+    /**
+     * @ORM\Column(type="decimal", precision=10, scale=2)
+     */
+    private $precio;
 
     /**
      * @ORM\Column(type="string", length=50)
@@ -41,12 +39,12 @@ class Producto
     private $clasificacion;
 
     /**
-     * @ORM\Column(type="string", length=1000, nullable=true)
+     * @ORM\ManyToOne(targetEntity=Producto::class, inversedBy="costos")
      */
-    private $descripcion;
+    private $producto;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Empresa::class, inversedBy="productos")
+     * @ORM\ManyToOne(targetEntity=Empresa::class, inversedBy="costos")
      */
     private $empresa;
 
@@ -70,18 +68,12 @@ class Producto
      */
     private $updateBy;
 
-    /**
-     * @ORM\OneToMany(targetEntity=Costo::class, mappedBy="producto")
-     */
-    private $costos;
-
     public function __construct()
     {
         $this->createAt = new \DateTime();
         $this->createBy = 'system'; // Default creator, can be changed later
         $this->updateAt = null; // Initially no updates
         $this->updateBy = null; // Initially no updates
-        $this->costos = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -89,38 +81,38 @@ class Producto
         return $this->id;
     }
 
-    public function getNombre(): ?string
+    public function getTipo(): ?string
     {
-        return $this->nombre;
+        return $this->tipo;
     }
 
-    public function setNombre(string $nombre): self
+    public function setTipo(string $tipo): self
     {
-        $this->nombre = $nombre;
+        $this->tipo = $tipo;
 
         return $this;
     }
 
-    public function getSku(): ?string
+    public function getConcepto(): ?string
     {
-        return $this->sku;
+        return $this->concepto;
     }
 
-    public function setSku(?string $sku): self
+    public function setConcepto(string $concepto): self
     {
-        $this->sku = $sku;
+        $this->concepto = $concepto;
 
         return $this;
     }
 
-    public function getMedida(): ?string
+    public function getPrecio(): ?string
     {
-        return $this->medida;
+        return $this->precio;
     }
 
-    public function setMedida(string $medida): self
+    public function setPrecio(string $precio): self
     {
-        $this->medida = $medida;
+        $this->precio = $precio;
 
         return $this;
     }
@@ -137,14 +129,14 @@ class Producto
         return $this;
     }
 
-    public function getDescripcion(): ?string
+    public function getProducto(): ?Producto
     {
-        return $this->descripcion;
+        return $this->producto;
     }
 
-    public function setDescripcion(?string $descripcion): self
+    public function setProducto(?Producto $producto): self
     {
-        $this->descripcion = $descripcion;
+        $this->producto = $producto;
 
         return $this;
     }
@@ -205,36 +197,6 @@ class Producto
     public function setUpdateBy(?string $updateBy): self
     {
         $this->updateBy = $updateBy;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection|Costo[]
-     */
-    public function getCostos(): Collection
-    {
-        return $this->costos;
-    }
-
-    public function addCosto(Costo $costo): self
-    {
-        if (!$this->costos->contains($costo)) {
-            $this->costos[] = $costo;
-            $costo->setProducto($this);
-        }
-
-        return $this;
-    }
-
-    public function removeCosto(Costo $costo): self
-    {
-        if ($this->costos->removeElement($costo)) {
-            // set the owning side to null (unless already changed)
-            if ($costo->getProducto() === $this) {
-                $costo->setProducto(null);
-            }
-        }
 
         return $this;
     }

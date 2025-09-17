@@ -224,8 +224,12 @@ class ProductoController extends AbstractController
         try {
             $data = json_decode($request->getContent(), true);
             return $repository->update($id, $data, $validator, $helper); 
-        } catch (Exception $e) {
-            return new JsonResponse(['msg' => 'Error del Servidor', 'error' => $e->getMessage()], 500);
+        } catch (\Exception $e) {
+            return new JsonResponse([
+                'success' => false,
+                'message' => 'Error del Servidor',
+                'error' => $e->getMessage()
+            ], 500);
         }
     }
 }
