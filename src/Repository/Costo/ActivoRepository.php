@@ -100,7 +100,7 @@ class ActivoRepository extends ServiceEntityRepository
                 'costoInicial' => $product->getCostoInicial(),
                 'valorResidual' => $product->getValorResidual(),
                 'vidaUtil' => $product->getVidaUtil(),
-                'fechaCompra' => $product->getFechaCompra(),
+                'fechaCompra' => $product->getFechaCompra()->format('Y-m-d'),
             ];
         }
 

@@ -101,7 +101,8 @@ class CostoRepository extends ServiceEntityRepository
                 'concepto' => $costo->getConcepto(),
                 'clasificacion' => $costo->getClasificacion(),
                 'precio' => $costo->getPrecio(),
-                'producto' => $costo->getProducto(),
+                'producto' => $costo->getProducto() ? $costo->getProducto()->getId() : null,
+                'productoName' => $costo->getProducto() ? $costo->getProducto()->getNombre() : null,
             ];
         }
 
