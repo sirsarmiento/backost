@@ -36,7 +36,10 @@ class CostoRepository extends ServiceEntityRepository
 
         try {
             // Crear entidad principal - costo
+
             $entity = $helper->setParametersToEntity(new Costo(), $data);
+
+            $entity->setPrecio((string) $data['precio']);
             
             // Validar entidad principal
             $errors = $validator->validate($entity);

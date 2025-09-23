@@ -36,7 +36,8 @@ class ProductoController extends AbstractController
      *             @OA\Property(property="sku", type="string", example="sku", description="SKU del producto (opcional)"),
      *             @OA\Property(property="descripcion", type="string", example="Descrip", description="Descripción del producto"),
      *             @OA\Property(property="clasificacion", type="string", example="Proyecto", description="Clasificación del producto"),
-     *             @OA\Property(property="medida", type="string", example="Metros", description="Unidad de medida del producto")
+     *             @OA\Property(property="medida", type="string", example="Metros", description="Unidad de medida del producto"),
+    *              @OA\Property(property="perfil", type="integer", example=1, description="ID del perfil")
      *         )
      *     ),
      *     @OA\Response(

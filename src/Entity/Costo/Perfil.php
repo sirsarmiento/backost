@@ -90,6 +90,11 @@ class Perfil
      */
     private $parametros;
 
+    /**
+     * @ORM\OneToMany(targetEntity=Producto::class, mappedBy="perfil")
+     */
+    private $productos;
+
     public function __construct()
     {
         $this->parametros = new ArrayCollection();
@@ -97,6 +102,7 @@ class Perfil
         $this->createBy = 'system'; // Default creator, can be changed later
         $this->updateAt = null; // Initially no updates
         $this->updateBy = null; // Initially no updates
+        $this->productos = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -284,6 +290,36 @@ class Perfil
             // set the owning side to null (unless already changed)
             if ($parametro->getPerfil() === $this) {
                 $parametro->setPerfil(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Producto[]
+     */
+    public function getProductos(): Collection
+    {
+        return $this->productos;
+    }
+
+    public function addProducto(Producto $producto): self
+    {
+        if (!$this->productos->contains($producto)) {
+            $this->productos[] = $producto;
+            $producto->setPerfil($this);
+        }
+
+        return $this;
+    }
+
+    public function removeProducto(Producto $producto): self
+    {
+        if ($this->productos->removeElement($producto)) {
+            // set the owning side to null (unless already changed)
+            if ($producto->getPerfil() === $this) {
+                $producto->setPerfil(null);
             }
         }
 

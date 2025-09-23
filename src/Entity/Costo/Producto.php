@@ -75,6 +75,11 @@ class Producto
      */
     private $costos;
 
+    /**
+     * @ORM\ManyToOne(targetEntity=Perfil::class, inversedBy="productos")
+     */
+    private $perfil;
+
     public function __construct()
     {
         $this->createAt = new \DateTime();
@@ -235,6 +240,18 @@ class Producto
                 $costo->setProducto(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getPerfil(): ?Perfil
+    {
+        return $this->perfil;
+    }
+
+    public function setPerfil(?Perfil $perfil): self
+    {
+        $this->perfil = $perfil;
 
         return $this;
     }

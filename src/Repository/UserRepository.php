@@ -523,41 +523,41 @@ class UserRepository extends ServiceEntityRepository
         $empresa= $entityManager->getRepository(Empresa::class)->find($this->security->getUser()->getIdempresa());
             if($empresa)
                 $entity->setIdempresa($empresa);
-        if(isset($data["gerenciaId"])){
-            $entityGerencia = $entityManager->getRepository(Gerencia::class)->findOneById($data["gerenciaId"]);          
-            $entity->setIdGerencia($entityGerencia?$entityGerencia:null);
-        }
-        if(isset($data["coordinacionId"])){
-            $entityCoordinacion = $entityManager->getRepository(Coordinacion::class)->findOneById($data["coordinacionId"]);          
-            $entity->setIdCoordinacion($entityCoordinacion?$entityCoordinacion:null);
+        // if(isset($data["gerenciaId"])){
+        //     $entityGerencia = $entityManager->getRepository(Gerencia::class)->findOneById($data["gerenciaId"]);          
+        //     $entity->setIdGerencia($entityGerencia?$entityGerencia:null);
+        // }
+        // if(isset($data["coordinacionId"])){
+        //     $entityCoordinacion = $entityManager->getRepository(Coordinacion::class)->findOneById($data["coordinacionId"]);          
+        //     $entity->setIdCoordinacion($entityCoordinacion?$entityCoordinacion:null);
 
-        }
-        $entityTelefonosDelete =$entityManager->getRepository(Telefono::class)->findBy([
-            'idUser' => $id
-        ]);
-        foreach($entityTelefonosDelete as $telefonoDelete){               
-            $entityManager->remove($telefonoDelete);
-            $entityManager->flush();
-        }
-        foreach ($data["telefono"] as $key => $value){            
-            $entityTelefono=new Telefono();
-            $entityStatus = $entityManager->getRepository(Status::class)->findOneById(1);          
-            $entityTelefono->setIdUser($entity);
-            $entityTelefono->setNumero($value["numero"]);   
-            $entityTelefono->setCreateBy($currentUser->getUserName());
-            $entityTelefono->setIdStatus($entityStatus); 
-            $errors = $validator->validate($entityTelefono);
-            if($errors->count() > 0){
-                $errorsString = (string) $errors;
-                return new JsonResponse(['msg'=>$errorsString],500);
-            }else{
-                $empresa= $entityManager->getRepository(Empresa::class)->find($this->security->getUser()->getIdempresa());
-                if($empresa)
-                   $entityTelefono->setIdempresa($empresa);
-                $entityManager->persist($entityTelefono);
-                $entityManager->flush();
-            }    
-        }
+        // }
+        // $entityTelefonosDelete =$entityManager->getRepository(Telefono::class)->findBy([
+        //     'idUser' => $id
+        // ]);
+        // foreach($entityTelefonosDelete as $telefonoDelete){               
+        //     $entityManager->remove($telefonoDelete);
+        //     $entityManager->flush();
+        // }
+        // foreach ($data["telefono"] as $key => $value){            
+        //     $entityTelefono=new Telefono();
+        //     $entityStatus = $entityManager->getRepository(Status::class)->findOneById(1);          
+        //     $entityTelefono->setIdUser($entity);
+        //     $entityTelefono->setNumero($value["numero"]);   
+        //     $entityTelefono->setCreateBy($currentUser->getUserName());
+        //     $entityTelefono->setIdStatus($entityStatus); 
+        //     $errors = $validator->validate($entityTelefono);
+        //     if($errors->count() > 0){
+        //         $errorsString = (string) $errors;
+        //         return new JsonResponse(['msg'=>$errorsString],500);
+        //     }else{
+        //         $empresa= $entityManager->getRepository(Empresa::class)->find($this->security->getUser()->getIdempresa());
+        //         if($empresa)
+        //            $entityTelefono->setIdempresa($empresa);
+        //         $entityManager->persist($entityTelefono);
+        //         $entityManager->flush();
+        //     }    
+        // }
         $errors = $validator->validate($entity);
         if($errors->count() > 0){
             $errorsString = (string) $errors;
