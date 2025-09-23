@@ -101,6 +101,8 @@ class ProductoRepository extends ServiceEntityRepository
                 'clasificacion' => $product->getClasificacion(),
                 'descripcion' => $product->getDescripcion(),
                 'sku' => $product->getSku(),
+                'perfil' => $product->getPerfil() ? $product->getPerfil()->getId() : null,
+                'perfilName' => $product->getPerfil() ? $product->getPerfil()->getNombre() : null,
             ];
         }
 
