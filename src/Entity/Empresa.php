@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Entity\Costo\Activo;
 use App\Entity\Costo\Costo;
 use App\Entity\Costo\Perfil;
+use App\Entity\Costo\Presupuesto;
 use App\Entity\Costo\Producto;
 use App\Entity\Status;
 use App\Repository\EmpresaRepository;
@@ -80,12 +81,18 @@ class Empresa
      */
     private $activos;
 
+    /**
+     * @ORM\OneToMany(targetEntity=Presupuesto::class, mappedBy="empresa")
+     */
+    private $presupuestos;
+
     public function __construct()
     {
         $this->perfil = new ArrayCollection();
         $this->productos = new ArrayCollection();
         $this->costos = new ArrayCollection();
         $this->activos = new ArrayCollection();
+        $this->presupuestos = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -291,6 +298,36 @@ class Empresa
             // set the owning side to null (unless already changed)
             if ($activo->getEmpresa() === $this) {
                 $activo->setEmpresa(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Presupuesto[]
+     */
+    public function getPresupuestos(): Collection
+    {
+        return $this->presupuestos;
+    }
+
+    public function addPresupuesto(Presupuesto $presupuesto): self
+    {
+        if (!$this->presupuestos->contains($presupuesto)) {
+            $this->presupuestos[] = $presupuesto;
+            $presupuesto->setEmpresa($this);
+        }
+
+        return $this;
+    }
+
+    public function removePresupuesto(Presupuesto $presupuesto): self
+    {
+        if ($this->presupuestos->removeElement($presupuesto)) {
+            // set the owning side to null (unless already changed)
+            if ($presupuesto->getEmpresa() === $this) {
+                $presupuesto->setEmpresa(null);
             }
         }
 
