@@ -36,7 +36,18 @@ class ActivoRepository extends ServiceEntityRepository
         try {
             // Crear entidad principal - Activo
             $entity = $helper->setParametersToEntity(new Activo(), $data);
-            
+
+            //var_dump($data); die;
+
+            // Convertir montos al formato correcto para la base de datos
+            if (isset($data['costoInicial'])) {
+                $entity->setCostoInicial($this->formatDecimalValue($data['costoInicial']));
+            }
+
+            if (isset($data['valorResidual'])) {
+                $entity->setValorResidual($this->formatDecimalValue($data['valorResidual']));
+            }
+                
             // Validar entidad principal
             $errors = $validator->validate($entity);
             if ($errors->count() > 0) {
@@ -84,6 +95,35 @@ class ActivoRepository extends ServiceEntityRepository
                 'error' => $e->getMessage()
             ], 500);
         }
+    }
+
+    /**
+     * Convierte un valor con formato español (1.234,56) a formato numérico para BD (1234.56)
+     */
+    private function formatDecimalValue($value): string
+    {
+        // Si ya es numérico o null, retornar como string
+        if ($value === null || $value === '') {
+            return '0';
+        }
+        
+        // Si ya es un número (sin comas)
+        if (is_numeric($value)) {
+            return (string) $value;
+        }
+        
+        // Convertir de formato español a inglés
+        // 1. Eliminar puntos (separadores de miles)
+        $withoutThousandSeparator = str_replace('.', '', $value);
+        // 2. Reemplazar coma por punto (separador decimal)
+        $withDecimalPoint = str_replace(',', '.', $withoutThousandSeparator);
+        
+        // Validar que el resultado sea numérico
+        if (!is_numeric($withDecimalPoint)) {
+            throw new \InvalidArgumentException("Valor decimal inválido: {$value}");
+        }
+        
+        return $withDecimalPoint;
     }
 
     public function getAll(): array 

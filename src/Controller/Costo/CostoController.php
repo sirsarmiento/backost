@@ -283,10 +283,10 @@ class CostoController extends AbstractController
      *     )
      * )
      */
-    public function delete(int $id, CostoRepository $repository): JsonResponse
+    public function delete(int $id, CostoRepository $repository, ValidatorInterface $validator): JsonResponse
     {   
         try {
-            return $repository->delete($id); 
+            return $repository->delete($id, $validator); 
         } catch (\Exception $e) {
             return new JsonResponse([
                 'success' => false,

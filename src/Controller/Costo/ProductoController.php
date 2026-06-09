@@ -110,8 +110,9 @@ class ProductoController extends AbstractController
      *                     @OA\Property(property="descripcion", type="string", example="Descrip"),
      *                     @OA\Property(property="clasificacion", type="string", example="Proyecto"),
      *                     @OA\Property(property="medida", type="string", example="Metros"),
-     *                     @OA\Property(property="createAt", type="string", format="date-time", example="2023-12-20 10:30:00"),
-     *                     @OA\Property(property="createBy", type="string", example="usuario")
+     *                     @OA\Property(property="createAt", type="string", format="date-time", example="2023-1s2-20 10:30:00"),
+     *                     @OA\Property(property="createBy", type="string", example="usuario"),
+     *                     @OA\Property(property="perfil", type="integer", example=1, description="ID del perfil empresarial al que pertenece el producto")
      *                 )
      *             ),
      *             @OA\Property(property="count", type="integer", example=5)

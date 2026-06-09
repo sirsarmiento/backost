@@ -174,4 +174,30 @@ class CostoRepository extends ServiceEntityRepository
             ], 500);
         }
     }
+
+    /**
+     * Delete Costo.
+     */
+    public function delete($id, $validator): JsonResponse  
+    {
+        $entityManager = $this->getEntityManager();
+        $entity =$entityManager->getRepository(Costo::class)->find($id);
+
+        if (!$entity) {
+            return new JsonResponse(['msg'=>'No existen Registros con el id: '.$id],404);  
+        }
+        
+        $entityManager->remove($entity);
+        
+        $entityManager->flush();
+        $errors = $validator->validate($entity);
+        if($errors->count() > 0){
+            $errorsString = (string) $errors;
+            return new JsonResponse(['msg'=>$errorsString],409);
+        }else{
+            $entityManager->flush();
+            return new JsonResponse(['msg'=>'Registro Eliminado: '.$entity->getId()],200);
+        }
+
+    } 
 }

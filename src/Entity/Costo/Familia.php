@@ -3,15 +3,15 @@
 namespace App\Entity\Costo;
 
 use App\Entity\Empresa;
-use App\Repository\Costo\ProductoRepository;
+use App\Repository\Costo\FamiliaRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Entity(repositoryClass=ProductoRepository::class)
+ * @ORM\Entity(repositoryClass=FamiliaRepository::class)
  */
-class Producto
+class Familia
 {
     /**
      * @ORM\Id
@@ -21,32 +21,17 @@ class Producto
     private $id;
 
     /**
+     * @ORM\Column(type="string", length=10)
+     */
+    private $codigo;
+
+    /**
      * @ORM\Column(type="string", length=255)
      */
     private $nombre;
 
     /**
-     * @ORM\Column(type="string", length=50, nullable=true)
-     */
-    private $sku;
-
-    /**
-     * @ORM\Column(type="string", length=50)
-     */
-    private $medida;
-
-    /**
-     * @ORM\Column(type="string", length=50)
-     */
-    private $clasificacion;
-
-    /**
-     * @ORM\Column(type="string", length=1000, nullable=true)
-     */
-    private $descripcion;
-
-    /**
-     * @ORM\ManyToOne(targetEntity=Empresa::class, inversedBy="productos")
+     * @ORM\ManyToOne(targetEntity=Empresa::class, inversedBy="familias")
      */
     private $empresa;
 
@@ -56,7 +41,7 @@ class Producto
     private $createAt;
 
     /**
-     * @ORM\Column(type="string", length=50)
+     * @ORM\Column(type="string", length=50, nullable=true)
      */
     private $createBy;
 
@@ -71,17 +56,12 @@ class Producto
     private $updateBy;
 
     /**
-     * @ORM\OneToMany(targetEntity=Costo::class, mappedBy="producto")
+     * @ORM\OneToMany(targetEntity=SubFamilia::class, mappedBy="familia")
      */
-    private $costos;
+    private $subFamilias;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Perfil::class, inversedBy="productos")
-     */
-    private $perfil;
-
-    /**
-     * @ORM\OneToMany(targetEntity=Codigo::class, mappedBy="producto")
+     * @ORM\OneToMany(targetEntity=Codigo::class, mappedBy="familia")
      */
     private $codigos;
 
@@ -91,13 +71,25 @@ class Producto
         $this->createBy = 'system'; // Default creator, can be changed later
         $this->updateAt = null; // Initially no updates
         $this->updateBy = null; // Initially no updates
-        $this->costos = new ArrayCollection();
+        $this->subFamilias = new ArrayCollection();
         $this->codigos = new ArrayCollection();
     }
 
     public function getId(): ?int
     {
         return $this->id;
+    }
+
+    public function getCodigo(): ?string
+    {
+        return $this->codigo;
+    }
+
+    public function setCodigo(string $codigo): self
+    {
+        $this->codigo = $codigo;
+
+        return $this;
     }
 
     public function getNombre(): ?string
@@ -108,54 +100,6 @@ class Producto
     public function setNombre(string $nombre): self
     {
         $this->nombre = $nombre;
-
-        return $this;
-    }
-
-    public function getSku(): ?string
-    {
-        return $this->sku;
-    }
-
-    public function setSku(?string $sku): self
-    {
-        $this->sku = $sku;
-
-        return $this;
-    }
-
-    public function getMedida(): ?string
-    {
-        return $this->medida;
-    }
-
-    public function setMedida(string $medida): self
-    {
-        $this->medida = $medida;
-
-        return $this;
-    }
-
-    public function getClasificacion(): ?string
-    {
-        return $this->clasificacion;
-    }
-
-    public function setClasificacion(string $clasificacion): self
-    {
-        $this->clasificacion = $clasificacion;
-
-        return $this;
-    }
-
-    public function getDescripcion(): ?string
-    {
-        return $this->descripcion;
-    }
-
-    public function setDescripcion(?string $descripcion): self
-    {
-        $this->descripcion = $descripcion;
 
         return $this;
     }
@@ -189,7 +133,7 @@ class Producto
         return $this->createBy;
     }
 
-    public function setCreateBy(string $createBy): self
+    public function setCreateBy(?string $createBy): self
     {
         $this->createBy = $createBy;
 
@@ -221,43 +165,31 @@ class Producto
     }
 
     /**
-     * @return Collection|Costo[]
+     * @return Collection|SubFamilia[]
      */
-    public function getCostos(): Collection
+    public function getSubFamilias(): Collection
     {
-        return $this->costos;
+        return $this->subFamilias;
     }
 
-    public function addCosto(Costo $costo): self
+    public function addSubFamilia(SubFamilia $subFamilia): self
     {
-        if (!$this->costos->contains($costo)) {
-            $this->costos[] = $costo;
-            $costo->setProducto($this);
+        if (!$this->subFamilias->contains($subFamilia)) {
+            $this->subFamilias[] = $subFamilia;
+            $subFamilia->setFamilia($this);
         }
 
         return $this;
     }
 
-    public function removeCosto(Costo $costo): self
+    public function removeSubFamilia(SubFamilia $subFamilia): self
     {
-        if ($this->costos->removeElement($costo)) {
+        if ($this->subFamilias->removeElement($subFamilia)) {
             // set the owning side to null (unless already changed)
-            if ($costo->getProducto() === $this) {
-                $costo->setProducto(null);
+            if ($subFamilia->getFamilia() === $this) {
+                $subFamilia->setFamilia(null);
             }
         }
-
-        return $this;
-    }
-
-    public function getPerfil(): ?Perfil
-    {
-        return $this->perfil;
-    }
-
-    public function setPerfil(?Perfil $perfil): self
-    {
-        $this->perfil = $perfil;
 
         return $this;
     }
@@ -274,7 +206,7 @@ class Producto
     {
         if (!$this->codigos->contains($codigo)) {
             $this->codigos[] = $codigo;
-            $codigo->setProducto($this);
+            $codigo->setFamilia($this);
         }
 
         return $this;
@@ -284,8 +216,8 @@ class Producto
     {
         if ($this->codigos->removeElement($codigo)) {
             // set the owning side to null (unless already changed)
-            if ($codigo->getProducto() === $this) {
-                $codigo->setProducto(null);
+            if ($codigo->getFamilia() === $this) {
+                $codigo->setFamilia(null);
             }
         }
 

@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Entity\Costo\Activo;
 use App\Entity\Costo\Costo;
+use App\Entity\Costo\Familia;
 use App\Entity\Costo\Perfil;
 use App\Entity\Costo\Presupuesto;
 use App\Entity\Costo\Producto;
@@ -86,6 +87,11 @@ class Empresa
      */
     private $presupuestos;
 
+    /**
+     * @ORM\OneToMany(targetEntity=Familia::class, mappedBy="empresa")
+     */
+    private $familias;
+
     public function __construct()
     {
         $this->perfil = new ArrayCollection();
@@ -93,6 +99,7 @@ class Empresa
         $this->costos = new ArrayCollection();
         $this->activos = new ArrayCollection();
         $this->presupuestos = new ArrayCollection();
+        $this->familias = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -328,6 +335,36 @@ class Empresa
             // set the owning side to null (unless already changed)
             if ($presupuesto->getEmpresa() === $this) {
                 $presupuesto->setEmpresa(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Familia[]
+     */
+    public function getFamilias(): Collection
+    {
+        return $this->familias;
+    }
+
+    public function addFamilia(Familia $familia): self
+    {
+        if (!$this->familias->contains($familia)) {
+            $this->familias[] = $familia;
+            $familia->setEmpresa($this);
+        }
+
+        return $this;
+    }
+
+    public function removeFamilia(Familia $familia): self
+    {
+        if ($this->familias->removeElement($familia)) {
+            // set the owning side to null (unless already changed)
+            if ($familia->getEmpresa() === $this) {
+                $familia->setEmpresa(null);
             }
         }
 
