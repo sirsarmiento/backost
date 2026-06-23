@@ -141,6 +141,11 @@ class ActivoRepository extends ServiceEntityRepository
                 'valorResidual' => $product->getValorResidual(),
                 'vidaUtil' => $product->getVidaUtil(),
                 'fechaCompra' => $product->getFechaCompra()->format('Y-m-d'),
+                'categoria' => $activo->getCategoria(),
+                'subCategoria' => $activo->getSubCategoria(),
+                'consumoMaquina' => $activo->getConsumoMaquina(),
+                'tarifa' => $activo->getTarifa(),
+                'costoMantenimiento' => $activo->getCostoMantenimiento()
             ];
         }
 

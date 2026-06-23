@@ -68,6 +68,31 @@ class Activo
      */
     private $updateBy;
 
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $categoria;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $subCategoria;
+
+    /**
+     * @ORM\Column(type="decimal", precision=10, scale=2)
+     */
+    private $consumoMaquina;
+
+    /**
+     * @ORM\Column(type="decimal", precision=10, scale=2)
+     */
+    private $tarifa;
+
+    /**
+     * @ORM\Column(type="decimal", precision=10, scale=2)
+     */
+    private $costoMantenimiento;
+
     public function __construct()
     {
         $this->createAt = new \DateTime();
@@ -197,6 +222,66 @@ class Activo
     public function setUpdateBy(?string $updateBy): self
     {
         $this->updateBy = $updateBy;
+
+        return $this;
+    }
+
+    public function getCategoria(): ?string
+    {
+        return $this->categoria;
+    }
+
+    public function setCategoria(?string $categoria): self
+    {
+        $this->categoria = $categoria;
+
+        return $this;
+    }
+
+    public function getSubCategoria(): ?string
+    {
+        return $this->subCategoria;
+    }
+
+    public function setSubCategoria(?string $subCategoria): self
+    {
+        $this->subCategoria = $subCategoria;
+
+        return $this;
+    }
+
+    public function getConsumoMaquina(): ?string
+    {
+        return $this->consumoMaquina;
+    }
+
+    public function setConsumoMaquina(string $consumoMaquina): self
+    {
+        $this->consumoMaquina = $consumoMaquina;
+
+        return $this;
+    }
+
+    public function getTarifa(): ?string
+    {
+        return $this->tarifa;
+    }
+
+    public function setTarifa(string $tarifa): self
+    {
+        $this->tarifa = $tarifa;
+
+        return $this;
+    }
+
+    public function getCostoMantenimiento(): ?string
+    {
+        return $this->costoMantenimiento;
+    }
+
+    public function setCostoMantenimiento(string $costoMantenimiento): self
+    {
+        $this->costoMantenimiento = $costoMantenimiento;
 
         return $this;
     }

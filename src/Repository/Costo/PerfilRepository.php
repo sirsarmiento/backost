@@ -274,7 +274,6 @@ class PerfilRepository extends ServiceEntityRepository
                 $parametro->setProdMaxHoras($parametroData['prodMaxHoras'] ?? null);
                 $parametro->setHorasMax($parametroData['horasMax'] ?? null);
                 $parametro->setHorasUso($parametroData['horasUso'] ?? null);
-                $parametro->setMargenGanancia($parametroData['margenGanancia'] ?? null);
                 
                 // Validar parámetro
                 $parametroErrors = $validator->validate($parametro);
