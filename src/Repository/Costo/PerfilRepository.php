@@ -164,6 +164,7 @@ class PerfilRepository extends ServiceEntityRepository
                 'periodo' => $perfil->getPeriodo(),
                 'direccion' => $perfil->getDireccion(),
                 'moneda' => $perfil->getMoneda(),
+                'margenGanancia' => $perfil->getMargenGanancia(),
                 'parametros' => $parametros
             ];
         }
@@ -273,6 +274,7 @@ class PerfilRepository extends ServiceEntityRepository
                 $parametro->setProdMaxHoras($parametroData['prodMaxHoras'] ?? null);
                 $parametro->setHorasMax($parametroData['horasMax'] ?? null);
                 $parametro->setHorasUso($parametroData['horasUso'] ?? null);
+                $parametro->setMargenGanancia($parametroData['margenGanancia'] ?? null);
                 
                 // Validar parámetro
                 $parametroErrors = $validator->validate($parametro);

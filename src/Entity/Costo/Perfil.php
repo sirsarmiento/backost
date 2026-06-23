@@ -95,6 +95,11 @@ class Perfil
      */
     private $productos;
 
+    /**
+     * @ORM\Column(type="integer")
+     */
+    private $margenGanancia;
+
     public function __construct()
     {
         $this->parametros = new ArrayCollection();
@@ -322,6 +327,18 @@ class Perfil
                 $producto->setPerfil(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getMargenGanancia(): ?int
+    {
+        return $this->margenGanancia;
+    }
+
+    public function setMargenGanancia(int $margenGanancia): self
+    {
+        $this->margenGanancia = $margenGanancia;
 
         return $this;
     }
