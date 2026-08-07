@@ -57,6 +57,11 @@ class Piezas
      */
     private $presupuesto;
 
+    /**
+     * @ORM\Column(type="decimal", precision=10, scale=2)
+     */
+    private $precioMaterial;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -154,6 +159,18 @@ class Piezas
     public function setPresupuesto(?Presupuesto $presupuesto): self
     {
         $this->presupuesto = $presupuesto;
+
+        return $this;
+    }
+
+    public function getPrecioMaterial(): ?string
+    {
+        return $this->precioMaterial;
+    }
+
+    public function setPrecioMaterial(string $precioMaterial): self
+    {
+        $this->precioMaterial = $precioMaterial;
 
         return $this;
     }

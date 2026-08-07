@@ -76,6 +76,31 @@ class PresupuestoRepository extends ServiceEntityRepository
                 ], 400);
             }
 
+            // Asignar nuevas propiedades si existen
+            if (isset($data['costoOperador'])) {
+                $entity->setCostoOperador((float) $data['costoOperador']);
+            }
+            
+            if (isset($data['costoMaquina'])) {
+                $entity->setCostoMaquina((float) $data['costoMaquina']);
+            }
+            
+            if (isset($data['tasaFalloGlobal'])) {
+                $entity->setTasaFalloGlobal((float) $data['tasaFalloGlobal']);
+            }
+            
+            if (isset($data['tiempoSetup'])) {
+                $entity->setTiempoSetup((int) $data['tiempoSetup']);
+            }
+            
+            if (isset($data['margenGanancia'])) {
+                $entity->setMargenGanancia((float) $data['margenGanancia']);
+            }
+            
+            if (isset($data['tiempoPostProcesado'])) {
+                $entity->setTiempoPostProcesado((int) $data['tiempoPostProcesado']);
+            }
+
             // Obtener usuario actual
             $currentUser = $entityManager->getRepository(User::class)
                 ->find($this->security->getUser()->getId());
@@ -125,7 +150,7 @@ class PresupuestoRepository extends ServiceEntityRepository
             return new JsonResponse([
                 'success' => true,
                 'message' => 'Presupuesto y piezas creados exitosamente',
-                'perfilId' => $entity->getId()
+                'presupuestoId' => $entity->getId()
             ], 201);
 
         } catch (\Exception $e) {
@@ -144,7 +169,7 @@ class PresupuestoRepository extends ServiceEntityRepository
     {
         foreach ($piezasData as $piezaData) {
             // Validar campos requeridos para pieza
-            $requiredPiezaFields = ['nombre', 'gramos', 'metros', 'horas', 'minutos'];
+            $requiredPiezaFields = ['nombre', 'gramos', 'metros', 'horas', 'minutos', 'precioMaterial'];
             foreach ($requiredPiezaFields as $field) {
                 if (!isset($piezaData[$field])) {
                     throw new \InvalidArgumentException("El campo '$field' es requerido para cada pieza");
@@ -158,6 +183,7 @@ class PresupuestoRepository extends ServiceEntityRepository
             $pieza->setMetros((float) $piezaData['metros']);
             $pieza->setHoras((int) $piezaData['horas']);
             $pieza->setMinutos((int) $piezaData['minutos']);
+            $pieza->setPrecioMaterial((float) $piezaData['precioMaterial']);
             $pieza->setPresupuesto($presupuesto);
             
             // Validar pieza
@@ -180,41 +206,49 @@ class PresupuestoRepository extends ServiceEntityRepository
         try {
             $presupuestos = $this->findAll();
 
-        $result = [];
+            $result = [];
 
-        foreach ($presupuestos as $presupuesto) {
-            $piezas = [];
-            
-            // Verificar si hay parámetros y recorrerlos
-            if ($presupuesto->getPiezas() && !$presupuesto->getPiezas()->isEmpty()) {
-                foreach ($presupuesto->getPiezas() as $pieza) {
-                    $piezas[] = [
-                        'id' => $pieza->getId(),
-                        'nombre' => $pieza->getNombre(),
-                        'gramos' => $pieza->getGramos(),
-                        'metros' => $pieza->getMetros(),
-                        'horas' => $pieza->getHoras(),
-                        'minutos' => $pieza->getMinutos(),
-                    ];
+            foreach ($presupuestos as $presupuesto) {
+                $piezas = [];
+                
+                // Verificar si hay piezas y recorrerlas
+                if ($presupuesto->getPiezas() && !$presupuesto->getPiezas()->isEmpty()) {
+                    foreach ($presupuesto->getPiezas() as $pieza) {
+                        $piezas[] = [
+                            'id' => $pieza->getId(),
+                            'nombre' => $pieza->getNombre(),
+                            'gramos' => $pieza->getGramos(),
+                            'metros' => $pieza->getMetros(),
+                            'horas' => $pieza->getHoras(),
+                            'minutos' => $pieza->getMinutos(),
+                            'precioMaterial' => $pieza->getPrecioMaterial(),
+                        ];
+                    }
                 }
+                
+                $result[] = [
+                    'id' => $presupuesto->getId(),
+                    'clasificacion' => $presupuesto->getClasificacion(),
+                    'descripcion' => $presupuesto->getDescripcion(),
+                    'numero' => $presupuesto->getNumero(),
+                    'fecha' => $presupuesto->getFecha()->format('Y-m-d'),
+                    'costoOperador' => $presupuesto->getCostoOperador(),
+                    'costoMaquina' => $presupuesto->getCostoMaquina(),
+                    'tasaFalloGlobal' => $presupuesto->getTasaFalloGlobal(),
+                    'tiempoSetup' => $presupuesto->getTiempoSetup(),
+                    'margenGanancia' => $presupuesto->getMargenGanancia(),
+                    'tiempoPostProcesado' => $presupuesto->getTiempoPostProcesado(),
+                    'piezas' => $piezas
+                ];
             }
-            
-            $result[] = [
-                'id' => $presupuesto->getId(),
-                'clasificacion' => $presupuesto->getClasificacion(),
-                'descripcion' => $presupuesto->getDescripcion(),
-                'numero' => $presupuesto->getNumero(),
-                'fecha' => $presupuesto->getFecha()->format('Y-m-d'),
-                'piezas' => $piezas
-            ];
-        }
 
-        return $result;
-        
+            return $result;
+            
         } catch (\Exception $e) {
-            return new JsonResponse([
-                'message' => 'Error al obtener los perfiles: ' . $e->getMessage()
-            ], 500);
+            // En lugar de devolver JsonResponse, lanzar excepción o devolver array con error
+            return [
+                'error' => 'Error al obtener los presupuestos: ' . $e->getMessage()
+            ];
         }
     }
 
@@ -233,8 +267,51 @@ class PresupuestoRepository extends ServiceEntityRepository
                 return new JsonResponse(['msg' => 'Presupuesto no encontrado'], 404);
             }
 
-            // Actualizar entidad principal
-            $presupuesto = $helper->setParametersToEntity($presupuesto, $data);
+            // Actualizar propiedades básicas
+            if (isset($data['clasificacion'])) {
+                $presupuesto->setClasificacion($data['clasificacion']);
+            }
+            if (isset($data['descripcion'])) {
+                $presupuesto->setDescripcion($data['descripcion']);
+            }
+            if (isset($data['numero'])) {
+                $presupuesto->setNumero($data['numero']);
+            }
+            if (isset($data['fecha'])) {
+                try {
+                    $fecha = new \DateTime($data['fecha']);
+                    $presupuesto->setFecha($fecha);
+                } catch (\Exception $e) {
+                    return new JsonResponse([
+                        'msg' => 'Formato de fecha inválido'
+                    ], 400);
+                }
+            }
+
+            // Actualizar nuevas propiedades
+            if (isset($data['costoOperador'])) {
+                $presupuesto->setCostoOperador((float) $data['costoOperador']);
+            }
+            
+            if (isset($data['costoMaquina'])) {
+                $presupuesto->setCostoMaquina((float) $data['costoMaquina']);
+            }
+            
+            if (isset($data['tasaFalloGlobal'])) {
+                $presupuesto->setTasaFalloGlobal((float) $data['tasaFalloGlobal']);
+            }
+            
+            if (isset($data['tiempoSetup'])) {
+                $presupuesto->setTiempoSetup((int) $data['tiempoSetup']);
+            }
+            
+            if (isset($data['margenGanancia'])) {
+                $presupuesto->setMargenGanancia((float) $data['margenGanancia']);
+            }
+            
+            if (isset($data['tiempoPostProcesado'])) {
+                $presupuesto->setTiempoPostProcesado((int) $data['tiempoPostProcesado']);
+            }
             
             // Validar entidad principal
             $errors = $validator->validate($presupuesto);
@@ -313,6 +390,7 @@ class PresupuestoRepository extends ServiceEntityRepository
                 $pieza->setMetros($piezaData['metros'] ?? 0);
                 $pieza->setHoras($piezaData['horas'] ?? 0);
                 $pieza->setMinutos($piezaData['minutos'] ?? 0);
+                $pieza->setPrecioMaterial($piezaData['precioMaterial'] ?? 0);
                 
                 // Actualizar campos de auditoría
                 $currentUser = $em->getRepository(User::class)

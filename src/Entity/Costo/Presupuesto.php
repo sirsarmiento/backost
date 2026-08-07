@@ -3,6 +3,7 @@
 namespace App\Entity\Costo;
 
 use App\Entity\Empresa;
+use App\Entity\Costo\Piezas;
 use App\Repository\Costo\PresupuestoRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -69,6 +70,36 @@ class Presupuesto
      * @ORM\OneToMany(targetEntity=Piezas::class, mappedBy="presupuesto")
      */
     private $piezas;
+
+    /**
+     * @ORM\Column(type="decimal", precision=10, scale=2, nullable=true)
+     */
+    private $costoOperador;
+
+    /**
+     * @ORM\Column(type="decimal", precision=10, scale=2, nullable=true)
+     */
+    private $costoMaquina;
+
+    /**
+     * @ORM\Column(type="decimal", precision=10, scale=2, nullable=true)
+     */
+    private $tasaFalloGlobal;
+
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    private $tiempoSetup;
+
+    /**
+     * @ORM\Column(type="decimal", precision=10, scale=2, nullable=true)
+     */
+    private $margenGanancia;
+
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    private $tiempoPostProcesado;
 
     public function __construct()
     {
@@ -218,6 +249,78 @@ class Presupuesto
                 $pieza->setPresupuesto(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getCostoOperador(): ?string
+    {
+        return $this->costoOperador;
+    }
+
+    public function setCostoOperador(?string $costoOperador): self
+    {
+        $this->costoOperador = $costoOperador;
+
+        return $this;
+    }
+
+    public function getCostoMaquina(): ?string
+    {
+        return $this->costoMaquina;
+    }
+
+    public function setCostoMaquina(?string $costoMaquina): self
+    {
+        $this->costoMaquina = $costoMaquina;
+
+        return $this;
+    }
+
+    public function getTasaFalloGlobal(): ?string
+    {
+        return $this->tasaFalloGlobal;
+    }
+
+    public function setTasaFalloGlobal(?string $tasaFalloGlobal): self
+    {
+        $this->tasaFalloGlobal = $tasaFalloGlobal;
+
+        return $this;
+    }
+
+    public function getTiempoSetup(): ?int
+    {
+        return $this->tiempoSetup;
+    }
+
+    public function setTiempoSetup(?int $tiempoSetup): self
+    {
+        $this->tiempoSetup = $tiempoSetup;
+
+        return $this;
+    }
+
+    public function getMargenGanancia(): ?string
+    {
+        return $this->margenGanancia;
+    }
+
+    public function setMargenGanancia(?string $margenGanancia): self
+    {
+        $this->margenGanancia = $margenGanancia;
+
+        return $this;
+    }
+
+    public function getTiempoPostProcesado(): ?int
+    {
+        return $this->tiempoPostProcesado;
+    }
+
+    public function setTiempoPostProcesado(?int $tiempoPostProcesado): self
+    {
+        $this->tiempoPostProcesado = $tiempoPostProcesado;
 
         return $this;
     }
