@@ -24,19 +24,26 @@ class ActivoController extends AbstractController
      * @Route("api/activo", methods={"POST"})
      * @OA\Post(
      *     summary="Crear un nuevo activo",
-     *     description="Crea un nuevo activo con sus datos básicos",
+     *     description="Crea un nuevo activo con sus datos básicos y propiedades adicionales",
      *     operationId="createActivo",
      *     tags={"Activos"},
      *     @OA\RequestBody(
      *         required=true,
      *         description="Datos del activo",
      *         @OA\JsonContent(
-     *             required={"nombre", "costoInicial", "valorResidual", "vidaUtil"},
+     *             required={"nombre", "costoInicial", "valorResidual", "vidaUtil", "tipo", "cantidad", "valorUnitario"},
      *             @OA\Property(property="nombre", type="string", example="Maquinaria Pesada", description="Nombre del activo"),
      *             @OA\Property(property="costoInicial", type="number", format="float", example=50000.00, description="Costo inicial del activo"),
      *             @OA\Property(property="valorResidual", type="number", format="float", example=5000.00, description="Valor residual del activo"),
      *             @OA\Property(property="vidaUtil", type="integer", example=5, description="Vida útil en años"),
-     *             @OA\Property(property="fechaCompra", type="string", format="date", example="2023-01-15", description="Fecha de compra (opcional)")
+     *             @OA\Property(property="fechaCompra", type="string", format="date", example="2023-01-15", description="Fecha de compra (opcional)"),
+     *             @OA\Property(property="tipo", type="string", example="Maquinaria", description="Tipo de activo", maxLength=50),
+     *             @OA\Property(property="cantidad", type="number", format="float", example=10.00, description="Cantidad del activo"),
+     *             @OA\Property(property="unidadMedida", type="string", example="Unidades", description="Unidad de medida del activo", maxLength=100, nullable=true),
+     *             @OA\Property(property="presentacion", type="string", example="Caja x 100 unidades", description="Presentación del activo", maxLength=255, nullable=true),
+     *             @OA\Property(property="descripcion", type="string", example="Maquinaria para proceso de producción", description="Descripción detallada del activo", maxLength=1000, nullable=true),
+     *             @OA\Property(property="ubicacion", type="string", example="Almacén Central - Estante 3", description="Ubicación física del activo", maxLength=255, nullable=true),
+     *             @OA\Property(property="valorUnitario", type="number", format="float", example=5000.00, description="Valor unitario del activo")
      *         )
      *     ),
      *     @OA\Response(
@@ -90,7 +97,7 @@ class ActivoController extends AbstractController
      * @Route("api/activos", methods={"GET"})
      * @OA\Get(
      *     summary="Obtener todos los activos",
-     *     description="Retorna una lista de todos los activos",
+     *     description="Retorna una lista de todos los activos con todas sus propiedades",
      *     operationId="getAllActivos",
      *     tags={"Activos"},
      *     @OA\Response(
@@ -109,6 +116,13 @@ class ActivoController extends AbstractController
      *                     @OA\Property(property="valorResidual", type="number", format="float", example=5000.00),
      *                     @OA\Property(property="vidaUtil", type="integer", example=5),
      *                     @OA\Property(property="fechaCompra", type="string", format="date", example="2023-01-15"),
+     *                     @OA\Property(property="tipo", type="string", example="Maquinaria", maxLength=50),
+     *                     @OA\Property(property="cantidad", type="number", format="float", example=10.00),
+     *                     @OA\Property(property="unidadMedida", type="string", example="Unidades", maxLength=100),
+     *                     @OA\Property(property="presentacion", type="string", example="Caja x 100 unidades", maxLength=255),
+     *                     @OA\Property(property="descripcion", type="string", example="Maquinaria para proceso de producción", maxLength=1000),
+     *                     @OA\Property(property="ubicacion", type="string", example="Almacén Central - Estante 3", maxLength=255),
+     *                     @OA\Property(property="valorUnitario", type="number", format="float", example=5000.00),
      *                     @OA\Property(property="createAt", type="string", format="date-time", example="2023-12-20 10:30:00"),
      *                     @OA\Property(property="createBy", type="string", example="usuario")
      *                 )
@@ -155,7 +169,7 @@ class ActivoController extends AbstractController
      * @Route("api/activo/{id}", methods={"PUT"})
      * @OA\Put(
      *     summary="Actualizar un activo existente",
-     *     description="Actualiza los datos de un activo",
+     *     description="Actualiza los datos de un activo incluyendo las nuevas propiedades",
      *     operationId="updateActivo",
      *     tags={"Activos"},
      *     @OA\Parameter(
@@ -169,12 +183,19 @@ class ActivoController extends AbstractController
      *         required=true,
      *         description="Datos del activo a actualizar",
      *         @OA\JsonContent(
-     *             required={"nombre", "costoInicial", "valorResidual", "vidaUtil"},
+     *             required={"nombre", "costoInicial", "valorResidual", "vidaUtil", "tipo", "cantidad", "valorUnitario"},
      *             @OA\Property(property="nombre", type="string", example="Maquinaria Pesada Actualizada", description="Nombre del activo"),
      *             @OA\Property(property="costoInicial", type="number", format="float", example=55000.00, description="Costo inicial del activo"),
      *             @OA\Property(property="valorResidual", type="number", format="float", example=6000.00, description="Valor residual del activo"),
      *             @OA\Property(property="vidaUtil", type="integer", example=6, description="Vida útil en años"),
-     *             @OA\Property(property="fechaCompra", type="string", format="date", example="2023-02-20", description="Fecha de compra")
+     *             @OA\Property(property="fechaCompra", type="string", format="date", example="2023-02-20", description="Fecha de compra"),
+     *             @OA\Property(property="tipo", type="string", example="Maquinaria", description="Tipo de activo", maxLength=50),
+     *             @OA\Property(property="cantidad", type="number", format="float", example=15.00, description="Cantidad del activo"),
+     *             @OA\Property(property="unidadMedida", type="string", example="Unidades", description="Unidad de medida del activo", maxLength=100, nullable=true),
+     *             @OA\Property(property="presentacion", type="string", example="Caja x 150 unidades", description="Presentación del activo", maxLength=255, nullable=true),
+     *             @OA\Property(property="descripcion", type="string", example="Maquinaria actualizada para proceso de producción", description="Descripción detallada del activo", maxLength=1000, nullable=true),
+     *             @OA\Property(property="ubicacion", type="string", example="Almacén Central - Estante 5", description="Ubicación física del activo", maxLength=255, nullable=true),
+     *             @OA\Property(property="valorUnitario", type="number", format="float", example=6000.00, description="Valor unitario del activo")
      *         )
      *     ),
      *     @OA\Response(

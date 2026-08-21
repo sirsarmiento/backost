@@ -37,8 +37,6 @@ class ActivoRepository extends ServiceEntityRepository
             // Crear entidad principal - Activo
             $entity = $helper->setParametersToEntity(new Activo(), $data);
 
-            //var_dump($data); die;
-
             // Convertir montos al formato correcto para la base de datos
             if (isset($data['costoInicial'])) {
                 $entity->setCostoInicial($this->formatDecimalValue($data['costoInicial']));
@@ -46,6 +44,14 @@ class ActivoRepository extends ServiceEntityRepository
 
             if (isset($data['valorResidual'])) {
                 $entity->setValorResidual($this->formatDecimalValue($data['valorResidual']));
+            }
+
+            if (isset($data['cantidad'])) {
+                $entity->setCantidad($this->formatDecimalValue($data['cantidad']));
+            }
+
+            if (isset($data['valorUnitario'])) {
+                $entity->setValorUnitario($this->formatDecimalValue($data['valorUnitario']));
             }
                 
             // Validar entidad principal
@@ -129,32 +135,48 @@ class ActivoRepository extends ServiceEntityRepository
     public function getAll(): array 
     {
         try {
-        $products = $this->findAll();
+            $activos = $this->findAll();
+            $result = [];
 
-        $result = [];
+            foreach ($activos as $activo) {      
+                $result[] = [
+                    'id' => $activo->getId(),
+                    'nombre' => $activo->getNombre(),
+                    'costoInicial' => $activo->getCostoInicial(),
+                    'valorResidual' => $activo->getValorResidual(),
+                    'vidaUtil' => $activo->getVidaUtil(),
+                    'fechaCompra' => $activo->getFechaCompra() ? $activo->getFechaCompra()->format('Y-m-d') : null,
+                    'tipo' => $activo->getTipo(),
+                    'cantidad' => $activo->getCantidad(),
+                    'unidadMedida' => $activo->getUnidadMedida(),
+                    'presentacion' => $activo->getPresentacion(),
+                    'descripcion' => $activo->getDescripcion(),
+                    'ubicacion' => $activo->getUbicacion(),
+                    'valorUnitario' => $activo->getValorUnitario(),
+                    // Propiedades faltantes agregadas:
+                    'categoria' => $activo->getCategoria(),
+                    'subCategoria' => $activo->getSubCategoria(),
+                    'consumoMaquina' => $activo->getConsumoMaquina(),
+                    'tarifa' => $activo->getTarifa(),
+                    'costoMantenimiento' => $activo->getCostoMantenimiento(),
+                    // Propiedades de auditoría:
+                    'createAt' => $activo->getCreateAt() ? $activo->getCreateAt()->format('Y-m-d H:i:s') : null,
+                    'createBy' => $activo->getCreateBy(),
+                    'updateAt' => $activo->getUpdateAt() ? $activo->getUpdateAt()->format('Y-m-d H:i:s') : null,
+                    'updateBy' => $activo->getUpdateBy(),
+                    // Relación con Empresa
+                    'empresa' => $activo->getEmpresa() ? [
+                        'id' => $activo->getEmpresa()->getId(),
+                        'nombre' => $activo->getEmpresa()->getNombre() // Ajusta según los campos de tu entidad Empresa
+                    ] : null
+                ];
+            }
 
-        foreach ($products as $product) {      
-            $result[] = [
-                'id' => $product->getId(),
-                'nombre' => $product->getNombre(),
-                'costoInicial' => $product->getCostoInicial(),
-                'valorResidual' => $product->getValorResidual(),
-                'vidaUtil' => $product->getVidaUtil(),
-                'fechaCompra' => $product->getFechaCompra()->format('Y-m-d'),
-                'categoria' => $activo->getCategoria(),
-                'subCategoria' => $activo->getSubCategoria(),
-                'consumoMaquina' => $activo->getConsumoMaquina(),
-                'tarifa' => $activo->getTarifa(),
-                'costoMantenimiento' => $activo->getCostoMantenimiento()
-            ];
-        }
-
-        return $result;
-        
+            return $result;
+            
         } catch (\Exception $e) {
-            return new JsonResponse([
-                'message' => 'Error al obtener los productes: ' . $e->getMessage()
-            ], 500);
+            // En caso de error, retornar un array vacío
+            return [];
         }
     }
 
@@ -175,6 +197,23 @@ class ActivoRepository extends ServiceEntityRepository
 
             // Actualizar entidad principal
             $activo = $helper->setParametersToEntity($activo, $data);
+
+            // Convertir montos al formato correcto para la base de datos
+            if (isset($data['costoInicial'])) {
+                $activo->setCostoInicial($this->formatDecimalValue($data['costoInicial']));
+            }
+
+            if (isset($data['valorResidual'])) {
+                $activo->setValorResidual($this->formatDecimalValue($data['valorResidual']));
+            }
+
+            if (isset($data['cantidad'])) {
+                $activo->setCantidad($this->formatDecimalValue($data['cantidad']));
+            }
+
+            if (isset($data['valorUnitario'])) {
+                $activo->setValorUnitario($this->formatDecimalValue($data['valorUnitario']));
+            }
             
             // Validar entidad principal
             $errors = $validator->validate($activo);

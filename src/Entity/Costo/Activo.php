@@ -93,6 +93,41 @@ class Activo
      */
     private $costoMantenimiento;
 
+    /**
+     * @ORM\Column(type="string", length=50)
+     */
+    private $tipo;
+
+    /**
+     * @ORM\Column(type="decimal", precision=10, scale=2)
+     */
+    private $cantidad;
+
+    /**
+     * @ORM\Column(type="string", length=100, nullable=true)
+     */
+    private $unidadMedida;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $presentacion;
+
+    /**
+     * @ORM\Column(type="string", length=1000, nullable=true)
+     */
+    private $descripcion;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $ubicacion;
+
+    /**
+     * @ORM\Column(type="decimal", precision=10, scale=2)
+     */
+    private $valorUnitario;
+
     public function __construct()
     {
         $this->createAt = new \DateTime();
@@ -282,6 +317,90 @@ class Activo
     public function setCostoMantenimiento(string $costoMantenimiento): self
     {
         $this->costoMantenimiento = $costoMantenimiento;
+
+        return $this;
+    }
+
+    public function getTipo(): ?string
+    {
+        return $this->tipo;
+    }
+
+    public function setTipo(string $tipo): self
+    {
+        $this->tipo = $tipo;
+
+        return $this;
+    }
+
+    public function getCantidad(): ?string
+    {
+        return $this->cantidad;
+    }
+
+    public function setCantidad(string $cantidad): self
+    {
+        $this->cantidad = $cantidad;
+
+        return $this;
+    }
+
+    public function getUnidadMedida(): ?string
+    {
+        return $this->unidadMedida;
+    }
+
+    public function setUnidadMedida(string $unidadMedida): self
+    {
+        $this->unidadMedida = $unidadMedida;
+
+        return $this;
+    }
+
+    public function getPresentacion(): ?string
+    {
+        return $this->presentacion;
+    }
+
+    public function setPresentacion(?string $presentacion): self
+    {
+        $this->presentacion = $presentacion;
+
+        return $this;
+    }
+
+    public function getDescripcion(): ?string
+    {
+        return $this->descripcion;
+    }
+
+    public function setDescripcion(?string $descripcion): self
+    {
+        $this->descripcion = $descripcion;
+
+        return $this;
+    }
+
+    public function getUbicacion(): ?string
+    {
+        return $this->ubicacion;
+    }
+
+    public function setUbicacion(?string $ubicacion): self
+    {
+        $this->ubicacion = $ubicacion;
+
+        return $this;
+    }
+
+    public function getValorUnitario(): ?string
+    {
+        return $this->valorUnitario;
+    }
+
+    public function setValorUnitario(string $valorUnitario): self
+    {
+        $this->valorUnitario = $valorUnitario;
 
         return $this;
     }
