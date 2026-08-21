@@ -85,6 +85,26 @@ class Producto
      */
     private $codigos;
 
+    /**
+     * @ORM\Column(type="decimal", precision=10, scale=2)
+     */
+    private $tasaFallo;
+
+    /**
+     * @ORM\Column(type="decimal", precision=10, scale=2)
+     */
+    private $tiempoSetup;
+
+    /**
+     * @ORM\Column(type="decimal", precision=10, scale=2)
+     */
+    private $postProcesado;
+
+    /**
+     * @ORM\Column(type="decimal", precision=10, scale=2)
+     */
+    private $margenGanancia;
+
     public function __construct()
     {
         $this->createAt = new \DateTime();
@@ -288,6 +308,54 @@ class Producto
                 $codigo->setProducto(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getTasaFallo(): ?string
+    {
+        return $this->tasaFallo;
+    }
+
+    public function setTasaFallo(string $tasaFallo): self
+    {
+        $this->tasaFallo = $tasaFallo;
+
+        return $this;
+    }
+
+    public function getTiempoSetup(): ?string
+    {
+        return $this->tiempoSetup;
+    }
+
+    public function setTiempoSetup(string $tiempoSetup): self
+    {
+        $this->tiempoSetup = $tiempoSetup;
+
+        return $this;
+    }
+
+    public function getPostProcesado(): ?string
+    {
+        return $this->postProcesado;
+    }
+
+    public function setPostProcesado(string $postProcesado): self
+    {
+        $this->postProcesado = $postProcesado;
+
+        return $this;
+    }
+
+    public function getMargenGanancia(): ?string
+    {
+        return $this->margenGanancia;
+    }
+
+    public function setMargenGanancia(string $margenGanancia): self
+    {
+        $this->margenGanancia = $margenGanancia;
 
         return $this;
     }

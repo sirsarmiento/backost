@@ -69,6 +69,20 @@ class ProductoRepository extends ServiceEntityRepository
                 $entity->setEmpresa($empresa);
             }
 
+            // Establecer valores por defecto para las nuevas propiedades si no vienen en $data
+            if (!isset($data['tasaFallo']) || $data['tasaFallo'] === null) {
+                $entity->setTasaFallo(0.00);
+            }
+            if (!isset($data['tiempoSetup']) || $data['tiempoSetup'] === null) {
+                $entity->setTiempoSetup(0.00);
+            }
+            if (!isset($data['postProcesado']) || $data['postProcesado'] === null) {
+                $entity->setPostProcesado(0.00);
+            }
+            if (!isset($data['margenGanancia']) || $data['margenGanancia'] === null) {
+                $entity->setMargenGanancia(0.00);
+            }
+
             // Persistir y flush
             $entityManager->persist($entity);
             $entityManager->flush();
@@ -89,29 +103,36 @@ class ProductoRepository extends ServiceEntityRepository
     public function getAll(): array 
     {
         try {
-        $products = $this->findAll();
+            $products = $this->findAll();
 
-        $result = [];
+            $result = [];
 
-        foreach ($products as $product) {      
-            $result[] = [
-                'id' => $product->getId(),
-                'nombre' => $product->getNombre(),
-                'medida' => $product->getMedida(),
-                'clasificacion' => $product->getClasificacion(),
-                'descripcion' => $product->getDescripcion(),
-                'sku' => $product->getSku(),
-                'perfil' => $product->getPerfil() ? $product->getPerfil()->getId() : null,
-                'perfilName' => $product->getPerfil() ? $product->getPerfil()->getNombre() : null,
-            ];
-        }
+            foreach ($products as $product) {      
+                $result[] = [
+                    'id' => $product->getId(),
+                    'nombre' => $product->getNombre(),
+                    'medida' => $product->getMedida(),
+                    'clasificacion' => $product->getClasificacion(),
+                    'descripcion' => $product->getDescripcion(),
+                    'sku' => $product->getSku(),
+                    'perfil' => $product->getPerfil() ? $product->getPerfil()->getId() : null,
+                    'perfilName' => $product->getPerfil() ? $product->getPerfil()->getNombre() : null,
+                    // Nuevas propiedades
+                    'tasaFallo' => $product->getTasaFallo(),
+                    'tiempoSetup' => $product->getTiempoSetup(),
+                    'postProcesado' => $product->getPostProcesado(),
+                    'margenGanancia' => $product->getMargenGanancia(),
+                ];
+            }
 
-        return $result;
-        
+            return $result;
+            
         } catch (\Exception $e) {
-            return new JsonResponse([
-                'message' => 'Error al obtener los productes: ' . $e->getMessage()
-            ], 500);
+            // Si ocurre un error, devolvemos un array vacío con un mensaje de error
+            // Pero el método debe retornar un array según la definición
+            return [
+                'error' => 'Error al obtener los productos: ' . $e->getMessage()
+            ];
         }
     }
 

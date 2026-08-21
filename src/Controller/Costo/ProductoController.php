@@ -37,7 +37,11 @@ class ProductoController extends AbstractController
      *             @OA\Property(property="descripcion", type="string", example="Descrip", description="Descripción del producto"),
      *             @OA\Property(property="clasificacion", type="string", example="Proyecto", description="Clasificación del producto"),
      *             @OA\Property(property="medida", type="string", example="Metros", description="Unidad de medida del producto"),
-    *              @OA\Property(property="perfil", type="integer", example=1, description="ID del perfil")
+     *             @OA\Property(property="perfil", type="integer", example=1, description="ID del perfil"),
+     *             @OA\Property(property="tasaFallo", type="number", format="float", example=0.00, description="Tasa de fallo del producto"),
+     *             @OA\Property(property="tiempoSetup", type="number", format="float", example=0.00, description="Tiempo de setup en horas"),
+     *             @OA\Property(property="postProcesado", type="number", format="float", example=0.00, description="Tiempo de post-procesado en horas"),
+     *             @OA\Property(property="margenGanancia", type="number", format="float", example=0.00, description="Margen de ganancia del producto")
      *         )
      *     ),
      *     @OA\Response(
@@ -110,9 +114,13 @@ class ProductoController extends AbstractController
      *                     @OA\Property(property="descripcion", type="string", example="Descrip"),
      *                     @OA\Property(property="clasificacion", type="string", example="Proyecto"),
      *                     @OA\Property(property="medida", type="string", example="Metros"),
-     *                     @OA\Property(property="createAt", type="string", format="date-time", example="2023-1s2-20 10:30:00"),
+     *                     @OA\Property(property="createAt", type="string", format="date-time", example="2023-12-20 10:30:00"),
      *                     @OA\Property(property="createBy", type="string", example="usuario"),
-     *                     @OA\Property(property="perfil", type="integer", example=1, description="ID del perfil empresarial al que pertenece el producto")
+     *                     @OA\Property(property="perfil", type="integer", example=1, description="ID del perfil empresarial al que pertenece el producto"),
+     *                     @OA\Property(property="tasaFallo", type="number", format="float", example=2.50, description="Tasa de fallo del producto"),
+     *                     @OA\Property(property="tiempoSetup", type="number", format="float", example=1.75, description="Tiempo de setup en horas"),
+     *                     @OA\Property(property="postProcesado", type="number", format="float", example=0.50, description="Tiempo de post-procesado en horas"),
+     *                     @OA\Property(property="margenGanancia", type="number", format="float", example=15.00, description="Margen de ganancia del producto")
      *                 )
      *             ),
      *             @OA\Property(property="count", type="integer", example=5)
@@ -176,7 +184,11 @@ class ProductoController extends AbstractController
      *             @OA\Property(property="sku", type="string", example="sku-actualizado", description="SKU del producto"),
      *             @OA\Property(property="descripcion", type="string", example="Descripción actualizada", description="Descripción del producto"),
      *             @OA\Property(property="clasificacion", type="string", example="Proyecto", description="Clasificación del producto"),
-     *             @OA\Property(property="medida", type="string", example="Kilos", description="Unidad de medida del producto")
+     *             @OA\Property(property="medida", type="string", example="Kilos", description="Unidad de medida del producto"),
+     *             @OA\Property(property="tasaFallo", type="number", format="float", example=3.00, description="Tasa de fallo del producto"),
+     *             @OA\Property(property="tiempoSetup", type="number", format="float", example=2.00, description="Tiempo de setup en horas"),
+     *             @OA\Property(property="postProcesado", type="number", format="float", example=0.75, description="Tiempo de post-procesado en horas"),
+     *             @OA\Property(property="margenGanancia", type="number", format="float", example=20.00, description="Margen de ganancia del producto")
      *         )
      *     ),
      *     @OA\Response(
