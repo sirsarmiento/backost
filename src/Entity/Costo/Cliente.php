@@ -49,6 +49,16 @@ class Cliente
      */
     private $presupuestos;
 
+    /**
+     * @ORM\Column(type="string", length=20, nullable=true)
+     */
+    private $cedula;
+
+    /**
+     * @ORM\Column(type="string", length=100)
+     */
+    private $categoria;
+
     public function __construct()
     {
         $this->presupuestos = new ArrayCollection();
@@ -145,6 +155,30 @@ class Cliente
                 $presupuesto->setCliente(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getCedula(): ?string
+    {
+        return $this->cedula;
+    }
+
+    public function setCedula(?string $cedula): self
+    {
+        $this->cedula = $cedula;
+
+        return $this;
+    }
+
+    public function getCategoria(): ?string
+    {
+        return $this->categoria;
+    }
+
+    public function setCategoria(string $categoria): self
+    {
+        $this->categoria = $categoria;
 
         return $this;
     }

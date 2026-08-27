@@ -80,6 +80,8 @@ class ClienteRepository extends ServiceEntityRepository
                     'email' => $cliente->getEmail(),
                     'telefono' => $cliente->getTelefono(),
                     'direccion' => $cliente->getDireccion(),
+                    'cedula' => $cliente->getCedula(),
+                    'categoria' => $cliente->getCategoria(),
                 ];
             }
 
