@@ -121,6 +121,11 @@ class Presupuesto
      */
     private $producto;
 
+    /**
+     * @ORM\Column(type="decimal", precision=10, scale=2)
+     */
+    private $total;
+
     public function __construct()
     {
         $this->createAt = new \DateTime();
@@ -389,6 +394,18 @@ class Presupuesto
     public function setProducto(?Producto $producto): self
     {
         $this->producto = $producto;
+
+        return $this;
+    }
+
+    public function getTotal(): ?string
+    {
+        return $this->total;
+    }
+
+    public function setTotal(string $total): self
+    {
+        $this->total = $total;
 
         return $this;
     }

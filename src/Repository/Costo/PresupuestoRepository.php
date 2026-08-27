@@ -112,6 +112,11 @@ class PresupuestoRepository extends ServiceEntityRepository
                 $entity->setDelivery((float) $data['delivery']);
             }
 
+            // Asignar total si existe
+            if (isset($data['total'])) {
+                $entity->setTotal((float) $data['total']);
+            }
+
             if (isset($data['cliente'])) {
                 $cliente = $entityManager->getRepository(Cliente::class)->find($data['cliente']);
                 if ($cliente) {
@@ -316,6 +321,7 @@ class PresupuestoRepository extends ServiceEntityRepository
                     'tiempoPostProcesado' => $presupuesto->getTiempoPostProcesado(),
                     'cantidadGlobal' => $presupuesto->getCantidadGlobal(),
                     'delivery' => $presupuesto->getDelivery(),
+                    'total' => $presupuesto->getTotal(), // Agregar campo total
                     'cliente' => $presupuesto->getCliente() ? $presupuesto->getCliente()->getId() : null,
                     'producto' => $presupuesto->getProducto() ? $presupuesto->getProducto()->getId() : null,
                     'piezas' => $piezas
@@ -399,6 +405,11 @@ class PresupuestoRepository extends ServiceEntityRepository
 
             if (isset($data['delivery'])) {
                 $presupuesto->setDelivery((float) $data['delivery']);
+            }
+
+            // Actualizar total si existe
+            if (isset($data['total'])) {
+                $presupuesto->setTotal((float) $data['total']);
             }
 
             if (isset($data['cliente'])) {
