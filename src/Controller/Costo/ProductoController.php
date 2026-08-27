@@ -29,7 +29,7 @@ class ProductoController extends AbstractController
      *     tags={"Productos"},
      *     @OA\RequestBody(
      *         required=true,
-     *         description="Datos del producto",
+     *         description="Datos del producto y sus piezas",
      *         @OA\JsonContent(
      *             required={"nombre", "medida", "clasificacion"},
      *             @OA\Property(property="nombre", type="string", example="Producto", description="Nombre del producto"),
@@ -41,7 +41,27 @@ class ProductoController extends AbstractController
      *             @OA\Property(property="tasaFallo", type="number", format="float", example=0.00, description="Tasa de fallo del producto"),
      *             @OA\Property(property="tiempoSetup", type="number", format="float", example=0.00, description="Tiempo de setup en horas"),
      *             @OA\Property(property="postProcesado", type="number", format="float", example=0.00, description="Tiempo de post-procesado en horas"),
-     *             @OA\Property(property="margenGanancia", type="number", format="float", example=0.00, description="Margen de ganancia del producto")
+     *             @OA\Property(property="margenGanancia", type="number", format="float", example=0.00, description="Margen de ganancia del producto"),
+     *             @OA\Property(
+     *                 property="piezasProducto",
+     *                 type="array",
+     *                 description="Lista de piezas del producto",
+     *                 @OA\Items(
+     *                     type="object",
+     *                     required={"nombre", "gramos", "metros", "horas", "minutos", "precioMaterial"},
+     *                     @OA\Property(property="id", type="integer", example=1, description="ID de la pieza (opcional para creación)"),
+     *                     @OA\Property(property="nombre", type="string", example="PIEZA 1", description="Nombre de la pieza"),
+     *                     @OA\Property(property="gramos", type="number", format="float", example=1.0, description="Peso en gramos"),
+     *                     @OA\Property(property="metros", type="number", format="float", example=2.0, description="Longitud en metros"),
+     *                     @OA\Property(property="horas", type="integer", example=3, description="Horas de producción"),
+     *                     @OA\Property(property="minutos", type="integer", example=2, description="Minutos de producción"),
+     *                     @OA\Property(property="precioMaterial", type="number", format="float", example=10.50, description="Precio del material"),
+     *                     @OA\Property(property="tipo", type="string", example="Producción", description="Tipo de pieza", nullable=true),
+     *                     @OA\Property(property="cantidad", type="integer", example=5, description="Cantidad de piezas"),
+     *                     @OA\Property(property="activo", type="integer", example=1, description="ID del activo asociado"),
+     *                     @OA\Property(property="maquina", type="integer", example=1, description="ID de la máquina asociada")
+     *                 )
+     *             )
      *         )
      *     ),
      *     @OA\Response(
@@ -120,7 +140,26 @@ class ProductoController extends AbstractController
      *                     @OA\Property(property="tasaFallo", type="number", format="float", example=2.50, description="Tasa de fallo del producto"),
      *                     @OA\Property(property="tiempoSetup", type="number", format="float", example=1.75, description="Tiempo de setup en horas"),
      *                     @OA\Property(property="postProcesado", type="number", format="float", example=0.50, description="Tiempo de post-procesado en horas"),
-     *                     @OA\Property(property="margenGanancia", type="number", format="float", example=15.00, description="Margen de ganancia del producto")
+     *                     @OA\Property(property="margenGanancia", type="number", format="float", example=15.00, description="Margen de ganancia del producto"),
+     *                     @OA\Property(
+     *                         property="piezasProducto",
+     *                         type="array",
+     *                         description="Lista de piezas del producto",
+     *                         @OA\Items(
+     *                             type="object",
+     *                             @OA\Property(property="id", type="integer", example=1, description="ID de la pieza"),
+     *                             @OA\Property(property="nombre", type="string", example="PIEZA 1", description="Nombre de la pieza"),
+     *                             @OA\Property(property="gramos", type="number", format="float", example=1.0, description="Peso en gramos"),
+     *                             @OA\Property(property="metros", type="number", format="float", example=2.0, description="Longitud en metros"),
+     *                             @OA\Property(property="horas", type="integer", example=3, description="Horas de producción"),
+     *                             @OA\Property(property="minutos", type="integer", example=2, description="Minutos de producción"),
+     *                             @OA\Property(property="precioMaterial", type="number", format="float", example=10.50, description="Precio del material"),
+     *                             @OA\Property(property="tipo", type="string", example="Producción", description="Tipo de pieza", nullable=true),
+     *                             @OA\Property(property="cantidad", type="integer", example=5, description="Cantidad de piezas"),
+     *                             @OA\Property(property="activo", type="integer", example=1, description="ID del activo asociado"),
+     *                             @OA\Property(property="maquina", type="integer", example=1, description="ID de la máquina asociada")
+     *                         )
+     *                     )
      *                 )
      *             ),
      *             @OA\Property(property="count", type="integer", example=5)
@@ -238,6 +277,126 @@ class ProductoController extends AbstractController
         try {
             $data = json_decode($request->getContent(), true);
             return $repository->update($id, $data, $validator, $helper); 
+        } catch (\Exception $e) {
+            return new JsonResponse([
+                'success' => false,
+                'message' => 'Error del Servidor',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * @Route("/api/producto/{id}", methods={"GET"})
+     * @OA\Get(
+     *     summary="Obtener un producto por ID",
+     *     description="Retorna los detalles de un producto específico incluyendo sus piezas",
+     *     operationId="getProductoById",
+     *     tags={"Productos"},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="ID del producto a obtener",
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Producto obtenido exitosamente",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Producto obtenido exitosamente"),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="object",
+     *                 @OA\Property(property="id", type="integer", example=1),
+     *                 @OA\Property(property="nombre", type="string", example="Producto"),
+     *                 @OA\Property(property="sku", type="string", example="sku"),
+     *                 @OA\Property(property="descripcion", type="string", example="Descrip"),
+     *                 @OA\Property(property="clasificacion", type="string", example="Proyecto"),
+     *                 @OA\Property(property="medida", type="string", example="Metros"),
+     *                 @OA\Property(property="tasaFallo", type="number", format="float", example=2.50),
+     *                 @OA\Property(property="tiempoSetup", type="number", format="float", example=1.75),
+     *                 @OA\Property(property="postProcesado", type="number", format="float", example=0.50),
+     *                 @OA\Property(property="margenGanancia", type="number", format="float", example=15.00),
+     *                 @OA\Property(property="perfil", type="object",
+     *                     @OA\Property(property="id", type="integer", example=1),
+     *                     @OA\Property(property="nombre", type="string", example="Perfil Empresarial")
+     *                 ),
+     *                 @OA\Property(property="empresa", type="integer", example=1),
+     *                 @OA\Property(property="createAt", type="string", format="date-time", example="2023-12-20 10:30:00"),
+     *                 @OA\Property(property="createBy", type="string", example="usuario"),
+     *                 @OA\Property(property="updateAt", type="string", format="date-time", example="2023-12-20 11:30:00"),
+     *                 @OA\Property(property="updateBy", type="string", example="usuario"),
+     *                 @OA\Property(
+     *                     property="piezasProducto",
+     *                     type="array",
+     *                     description="Lista de piezas del producto",
+     *                     @OA\Items(
+     *                         type="object",
+     *                         @OA\Property(property="id", type="integer", example=1),
+     *                         @OA\Property(property="cantidad", type="integer", example=5),
+     *                         @OA\Property(
+     *                             property="pieza",
+     *                             type="object",
+     *                             @OA\Property(property="id", type="integer", example=1),
+     *                             @OA\Property(property="nombre", type="string", example="PIEZA 1"),
+     *                             @OA\Property(property="gramos", type="number", format="float", example=1.0),
+     *                             @OA\Property(property="metros", type="number", format="float", example=2.0),
+     *                             @OA\Property(property="horas", type="integer", example=3),
+     *                             @OA\Property(property="minutos", type="integer", example=2),
+     *                             @OA\Property(property="precioMaterial", type="number", format="float", example=10.50),
+     *                             @OA\Property(property="tipo", type="string", example="Producción")
+     *                         ),
+     *                         @OA\Property(
+     *                             property="activo",
+     *                             type="object",
+     *                             @OA\Property(property="id", type="integer", example=1),
+     *                             @OA\Property(property="nombre", type="string", example="Activo 1")
+     *                         )
+     *                     )
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Producto no encontrado",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Producto no encontrado")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Error interno del servidor",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Error del Servidor")
+     *         )
+     *     )
+     * )
+     * @Security(name="Bearer")
+     */
+    public function show(ProductoRepository $productoRepository, int $id): JsonResponse
+    {
+        try {
+            $result = $productoRepository->getProductoById($id);
+            
+            if (isset($result['error'])) {
+                return new JsonResponse([
+                    'success' => false,
+                    'message' => $result['error']
+                ], 404);
+            }
+            
+            return new JsonResponse([
+                'success' => true,
+                'message' => 'Producto obtenido exitosamente',
+                'data' => $result
+            ], 200);
+            
         } catch (\Exception $e) {
             return new JsonResponse([
                 'success' => false,

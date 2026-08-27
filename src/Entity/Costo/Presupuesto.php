@@ -101,6 +101,26 @@ class Presupuesto
      */
     private $tiempoPostProcesado;
 
+    /**
+     * @ORM\Column(type="integer")
+     */
+    private $cantidadGlobal;
+
+    /**
+     * @ORM\Column(type="decimal", precision=10, scale=2)
+     */
+    private $delivery;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Cliente::class, inversedBy="presupuestos")
+     */
+    private $cliente;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Producto::class, inversedBy="presupuestos")
+     */
+    private $producto;
+
     public function __construct()
     {
         $this->createAt = new \DateTime();
@@ -321,6 +341,54 @@ class Presupuesto
     public function setTiempoPostProcesado(?int $tiempoPostProcesado): self
     {
         $this->tiempoPostProcesado = $tiempoPostProcesado;
+
+        return $this;
+    }
+
+    public function getCantidadGlobal(): ?string
+    {
+        return $this->cantidadGlobal;
+    }
+
+    public function setCantidadGlobal(string $cantidadGlobal): self
+    {
+        $this->cantidadGlobal = $cantidadGlobal;
+
+        return $this;
+    }
+
+    public function getDelivery(): ?string
+    {
+        return $this->delivery;
+    }
+
+    public function setDelivery(string $delivery): self
+    {
+        $this->delivery = $delivery;
+
+        return $this;
+    }
+
+    public function getCliente(): ?Cliente
+    {
+        return $this->cliente;
+    }
+
+    public function setCliente(?Cliente $cliente): self
+    {
+        $this->cliente = $cliente;
+
+        return $this;
+    }
+
+    public function getProducto(): ?Producto
+    {
+        return $this->producto;
+    }
+
+    public function setProducto(?Producto $producto): self
+    {
+        $this->producto = $producto;
 
         return $this;
     }

@@ -105,6 +105,21 @@ class Producto
      */
     private $margenGanancia;
 
+    /**
+     * @ORM\OneToMany(targetEntity=Piezas::class, mappedBy="producto")
+     */
+    private $piezas;
+
+    /**
+     * @ORM\OneToMany(targetEntity=PiezasProducto::class, mappedBy="producto")
+     */
+    private $PiezasProducto;
+
+    /**
+     * @ORM\OneToMany(targetEntity=Presupuesto::class, mappedBy="producto")
+     */
+    private $presupuestos;
+
     public function __construct()
     {
         $this->createAt = new \DateTime();
@@ -113,6 +128,9 @@ class Producto
         $this->updateBy = null; // Initially no updates
         $this->costos = new ArrayCollection();
         $this->codigos = new ArrayCollection();
+        $this->piezas = new ArrayCollection();
+        $this->PiezasProducto = new ArrayCollection();
+        $this->presupuestos = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -356,6 +374,96 @@ class Producto
     public function setMargenGanancia(string $margenGanancia): self
     {
         $this->margenGanancia = $margenGanancia;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Piezas[]
+     */
+    public function getPiezas(): Collection
+    {
+        return $this->piezas;
+    }
+
+    public function addPieza(Piezas $pieza): self
+    {
+        if (!$this->piezas->contains($pieza)) {
+            $this->piezas[] = $pieza;
+            $pieza->setProducto($this);
+        }
+
+        return $this;
+    }
+
+    public function removePieza(Piezas $pieza): self
+    {
+        if ($this->piezas->removeElement($pieza)) {
+            // set the owning side to null (unless already changed)
+            if ($pieza->getProducto() === $this) {
+                $pieza->setProducto(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|PiezasProducto[]
+     */
+    public function getPiezasProducto(): Collection
+    {
+        return $this->PiezasProducto;
+    }
+
+    public function addPiezasProducto(PiezasProducto $piezasProducto): self
+    {
+        if (!$this->PiezasProducto->contains($piezasProducto)) {
+            $this->PiezasProducto[] = $piezasProducto;
+            $piezasProducto->setProducto($this);
+        }
+
+        return $this;
+    }
+
+    public function removePiezasProducto(PiezasProducto $piezasProducto): self
+    {
+        if ($this->PiezasProducto->removeElement($piezasProducto)) {
+            // set the owning side to null (unless already changed)
+            if ($piezasProducto->getProducto() === $this) {
+                $piezasProducto->setProducto(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Presupuesto[]
+     */
+    public function getPresupuestos(): Collection
+    {
+        return $this->presupuestos;
+    }
+
+    public function addPresupuesto(Presupuesto $presupuesto): self
+    {
+        if (!$this->presupuestos->contains($presupuesto)) {
+            $this->presupuestos[] = $presupuesto;
+            $presupuesto->setProducto($this);
+        }
+
+        return $this;
+    }
+
+    public function removePresupuesto(Presupuesto $presupuesto): self
+    {
+        if ($this->presupuestos->removeElement($presupuesto)) {
+            // set the owning side to null (unless already changed)
+            if ($presupuesto->getProducto() === $this) {
+                $presupuesto->setProducto(null);
+            }
+        }
 
         return $this;
     }

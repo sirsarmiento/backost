@@ -4,6 +4,8 @@ namespace App\Entity\Costo;
 
 use App\Entity\Empresa;
 use App\Repository\Costo\ActivoRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -128,12 +130,24 @@ class Activo
      */
     private $valorUnitario;
 
+    /**
+     * @ORM\OneToMany(targetEntity=Piezas::class, mappedBy="activo")
+     */
+    private $piezas;
+
+    /**
+     * @ORM\OneToMany(targetEntity=Piezas::class, mappedBy="maquina")
+     */
+    private $piezasMaquina;
+
     public function __construct()
     {
         $this->createAt = new \DateTime();
         $this->createBy = 'system'; // Default creator, can be changed later
         $this->updateAt = null; // Initially no updates
         $this->updateBy = null; // Initially no updates
+        $this->piezas = new ArrayCollection();
+        $this->piezasMaquina = new ArrayCollection(); // ¡NUEVO!
     }
 
     public function getId(): ?int
@@ -401,6 +415,65 @@ class Activo
     public function setValorUnitario(string $valorUnitario): self
     {
         $this->valorUnitario = $valorUnitario;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Piezas[]
+     */
+    public function getPiezas(): Collection
+    {
+        return $this->piezas;
+    }
+
+    public function addPieza(Piezas $pieza): self
+    {
+        if (!$this->piezas->contains($pieza)) {
+            $this->piezas[] = $pieza;
+            $pieza->setActivo($this);
+        }
+
+        return $this;
+    }
+
+    public function removePieza(Piezas $pieza): self
+    {
+        if ($this->piezas->removeElement($pieza)) {
+            // set the owning side to null (unless already changed)
+            if ($pieza->getActivo() === $this) {
+                $pieza->setActivo(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Piezas[]
+     */
+    public function getPiezasMaquina(): Collection
+    {
+        return $this->piezasMaquina;
+    }
+
+    public function addPiezasMaquina(Piezas $pieza): self
+    {
+        if (!$this->piezasMaquina->contains($pieza)) {
+            $this->piezasMaquina[] = $pieza;
+            $pieza->setMaquina($this);
+        }
+
+        return $this;
+    }
+
+    public function removePiezasMaquina(Piezas $pieza): self
+    {
+        if ($this->piezasMaquina->removeElement($pieza)) {
+            if ($pieza->getMaquina() === $this) {
+                $pieza->setMaquina(null);
+            }
+        }
 
         return $this;
     }

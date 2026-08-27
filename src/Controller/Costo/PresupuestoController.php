@@ -45,6 +45,10 @@ class PresupuestoController extends AbstractController
      *             @OA\Property(property="tiempoSetup", type="integer", example=30, description="Tiempo de setup en minutos"),
      *             @OA\Property(property="margenGanancia", type="number", format="float", example=20.00, description="Margen de ganancia en porcentaje"),
      *             @OA\Property(property="tiempoPostProcesado", type="integer", example=15, description="Tiempo de post-procesado en minutos"),
+     *             @OA\Property(property="cantidadGlobal", type="integer", example=100, description="Cantidad global del presupuesto"),
+     *             @OA\Property(property="delivery", type="number", format="float", example=50.00, description="Costo de delivery"),
+     *             @OA\Property(property="cliente", type="integer", example=1, description="ID del cliente asociado"),
+     *             @OA\Property(property="producto", type="integer", example=1, description="ID del producto asociado"),
      *             @OA\Property(
      *                 property="piezas",
      *                 type="array",
@@ -58,7 +62,12 @@ class PresupuestoController extends AbstractController
      *                     @OA\Property(property="metros", type="number", format="float", example=2.0, description="Longitud en metros"),
      *                     @OA\Property(property="horas", type="integer", example=3, description="Horas de producción"),
      *                     @OA\Property(property="minutos", type="integer", example=2, description="Minutos de producción"),
-     *                     @OA\Property(property="precioMaterial", type="number", format="float", example=10.50, description="Precio del material")
+     *                     @OA\Property(property="precioMaterial", type="number", format="float", example=10.50, description="Precio del material"),
+     *                     @OA\Property(property="tipo", type="string", example="Producción", description="Tipo de pieza", nullable=true),
+     *                     @OA\Property(property="cantidad", type="integer", example=5, description="Cantidad de piezas"),
+     *                     @OA\Property(property="producto", type="integer", example=1, description="ID del producto asociado"),
+     *                     @OA\Property(property="activo", type="integer", example=1, description="ID del activo asociado"),
+     *                     @OA\Property(property="maquina", type="integer", example=1, description="ID de la máquina asociada")
      *                 )
      *             )
      *         )
@@ -138,7 +147,11 @@ class PresupuestoController extends AbstractController
      *                     @OA\Property(property="tiempoSetup", type="integer", example=30),
      *                     @OA\Property(property="margenGanancia", type="number", format="float", example=20.00),
      *                     @OA\Property(property="tiempoPostProcesado", type="integer", example=15),
-     *                     @OA\Property(
+     *                     @OA\Property(property="cantidadGlobal", type="integer", example=100),
+     *                     @OA\Property(property="delivery", type="number", format="float", example=50.00),
+     *                     @OA\Property(property="cliente", type="integer", example=1),
+     *                     @OA\Property(property="producto", type="integer", example=1),
+     *                     @OA\Property(    
      *                         property="piezas",
      *                         type="array",
      *                         description="Lista de piezas del presupuesto",
@@ -150,7 +163,12 @@ class PresupuestoController extends AbstractController
      *                             @OA\Property(property="metros", type="number", format="float", example=2.0),
      *                             @OA\Property(property="horas", type="integer", example=3),
      *                             @OA\Property(property="minutos", type="integer", example=2),
-     *                             @OA\Property(property="precioMaterial", type="number", format="float", example=10.50)
+     *                             @OA\Property(property="precioMaterial", type="number", format="float", example=10.50),
+     *                             @OA\Property(property="tipo", type="string", example="Producción"),
+     *                             @OA\Property(property="cantidad", type="integer", example=5),
+     *                             @OA\Property(property="producto", type="integer", example=1),
+     *                             @OA\Property(property="activo", type="integer", example=1),
+     *                             @OA\Property(property="maquina", type="integer", example=1)
      *                         )
      *                     )
      *                 )
@@ -222,6 +240,10 @@ class PresupuestoController extends AbstractController
      *             @OA\Property(property="tiempoSetup", type="integer", example=30, description="Tiempo de setup en minutos"),
      *             @OA\Property(property="margenGanancia", type="number", format="float", example=20.00, description="Margen de ganancia en porcentaje"),
      *             @OA\Property(property="tiempoPostProcesado", type="integer", example=15, description="Tiempo de post-procesado en minutos"),
+     *             @OA\Property(property="cantidadGlobal", type="integer", example=100, description="Cantidad global del presupuesto"),
+     *             @OA\Property(property="delivery", type="number", format="float", example=50.00, description="Costo de delivery"),
+     *             @OA\Property(property="cliente", type="integer", example=1, description="ID del cliente asociado"),
+     *             @OA\Property(property="producto", type="integer", example=1, description="ID del producto asociado"),
      *             @OA\Property(
      *                 property="piezas",
      *                 type="array",
@@ -235,7 +257,12 @@ class PresupuestoController extends AbstractController
      *                     @OA\Property(property="metros", type="number", format="float", example=2.0, description="Longitud en metros"),
      *                     @OA\Property(property="horas", type="integer", example=3, description="Horas de producción"),
      *                     @OA\Property(property="minutos", type="integer", example=2, description="Minutos de producción"),
-     *                     @OA\Property(property="precioMaterial", type="number", format="float", example=10.50, description="Precio del material")
+     *                     @OA\Property(property="precioMaterial", type="number", format="float", example=10.50, description="Precio del material"),
+     *                     @OA\Property(property="tipo", type="string", example="Producción", description="Tipo de pieza", nullable=true),
+     *                     @OA\Property(property="cantidad", type="integer", example=5, description="Cantidad de piezas"),
+     *                     @OA\Property(property="producto", type="integer", example=1, description="ID del producto asociado"),
+     *                     @OA\Property(property="activo", type="integer", example=1, description="ID del activo asociado"),
+     *                     @OA\Property(property="maquina", type="integer", example=1, description="ID de la máquina asociada")
      *                 )
      *             )
      *         )

@@ -4,6 +4,9 @@ namespace App\Repository\Costo;
 
 use App\Entity\Costo\Presupuesto;
 use App\Entity\Costo\Piezas;
+use App\Entity\Costo\Producto;
+use App\Entity\Costo\Activo;
+use App\Entity\Costo\Cliente;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManagerInterface;
@@ -101,6 +104,28 @@ class PresupuestoRepository extends ServiceEntityRepository
                 $entity->setTiempoPostProcesado((int) $data['tiempoPostProcesado']);
             }
 
+            if (isset($data['cantidadGlobal'])) {
+                $entity->setCantidadGlobal((int) $data['cantidadGlobal']);
+            }
+
+            if (isset($data['delivery'])) {
+                $entity->setDelivery((float) $data['delivery']);
+            }
+
+            if (isset($data['cliente'])) {
+                $cliente = $entityManager->getRepository(Cliente::class)->find($data['cliente']);
+                if ($cliente) {
+                    $entity->setCliente($cliente);
+                }
+            }
+
+            if (isset($data['producto'])) {
+                $producto = $entityManager->getRepository(Producto::class)->find($data['producto']);
+                if ($producto) {
+                    $entity->setProducto($producto);
+                }
+            }
+
             // Obtener usuario actual
             $currentUser = $entityManager->getRepository(User::class)
                 ->find($this->security->getUser()->getId());
@@ -186,6 +211,40 @@ class PresupuestoRepository extends ServiceEntityRepository
             $pieza->setPrecioMaterial((float) $piezaData['precioMaterial']);
             $pieza->setPresupuesto($presupuesto);
             
+            // Asignar nuevas propiedades de pieza
+            if (isset($piezaData['tipo'])) {
+                $pieza->setTipo($piezaData['tipo']);
+            }
+            
+            if (isset($piezaData['cantidad'])) {
+                $pieza->setCantidad((int) $piezaData['cantidad']);
+            }
+            
+            // Asignar relaciones si existen
+            if (isset($piezaData['producto'])) {
+                $producto = $entityManager->getRepository(Producto::class)
+                    ->find($piezaData['producto']);
+                if ($producto) {
+                    $pieza->setProducto($producto);
+                }
+            }
+            
+            if (isset($piezaData['activo'])) {
+                $activo = $entityManager->getRepository(Activo::class)
+                    ->find($piezaData['activo']);
+                if ($activo) {
+                    $pieza->setActivo($activo);
+                }
+            }
+            
+            if (isset($piezaData['maquina'])) {
+                $maquina = $entityManager->getRepository(Activo::class)
+                    ->find($piezaData['maquina']);
+                if ($maquina) {
+                    $pieza->setMaquina($maquina);
+                }
+            }
+            
             // Validar pieza
             $errors = $validator->validate($pieza);
             if ($errors->count() > 0) {
@@ -214,7 +273,7 @@ class PresupuestoRepository extends ServiceEntityRepository
                 // Verificar si hay piezas y recorrerlas
                 if ($presupuesto->getPiezas() && !$presupuesto->getPiezas()->isEmpty()) {
                     foreach ($presupuesto->getPiezas() as $pieza) {
-                        $piezas[] = [
+                        $piezaData = [
                             'id' => $pieza->getId(),
                             'nombre' => $pieza->getNombre(),
                             'gramos' => $pieza->getGramos(),
@@ -222,7 +281,24 @@ class PresupuestoRepository extends ServiceEntityRepository
                             'horas' => $pieza->getHoras(),
                             'minutos' => $pieza->getMinutos(),
                             'precioMaterial' => $pieza->getPrecioMaterial(),
+                            'tipo' => $pieza->getTipo(),
+                            'cantidad' => $pieza->getCantidad(),
                         ];
+                        
+                        // Obtener IDs de relaciones
+                        if ($pieza->getProducto()) {
+                            $piezaData['producto'] = $pieza->getProducto()->getId();
+                        }
+                        
+                        if ($pieza->getActivo()) {
+                            $piezaData['activo'] = $pieza->getActivo()->getId();
+                        }
+                        
+                        if ($pieza->getMaquina()) {
+                            $piezaData['maquina'] = $pieza->getMaquina()->getId();
+                        }
+                        
+                        $piezas[] = $piezaData;
                     }
                 }
                 
@@ -238,6 +314,10 @@ class PresupuestoRepository extends ServiceEntityRepository
                     'tiempoSetup' => $presupuesto->getTiempoSetup(),
                     'margenGanancia' => $presupuesto->getMargenGanancia(),
                     'tiempoPostProcesado' => $presupuesto->getTiempoPostProcesado(),
+                    'cantidadGlobal' => $presupuesto->getCantidadGlobal(),
+                    'delivery' => $presupuesto->getDelivery(),
+                    'cliente' => $presupuesto->getCliente() ? $presupuesto->getCliente()->getId() : null,
+                    'producto' => $presupuesto->getProducto() ? $presupuesto->getProducto()->getId() : null,
                     'piezas' => $piezas
                 ];
             }
@@ -311,6 +391,32 @@ class PresupuestoRepository extends ServiceEntityRepository
             
             if (isset($data['tiempoPostProcesado'])) {
                 $presupuesto->setTiempoPostProcesado((int) $data['tiempoPostProcesado']);
+            }
+
+            if (isset($data['cantidadGlobal'])) {
+                $presupuesto->setCantidadGlobal((int) $data['cantidadGlobal']);
+            }
+
+            if (isset($data['delivery'])) {
+                $presupuesto->setDelivery((float) $data['delivery']);
+            }
+
+            if (isset($data['cliente'])) {
+                $cliente = $entityManager->getRepository(Cliente::class)->find($data['cliente']);
+                if ($cliente) {
+                    $presupuesto->setCliente($cliente);
+                } else {
+                    $presupuesto->setCliente(null);
+                }
+            }
+
+            if (isset($data['producto'])) {
+                $producto = $entityManager->getRepository(Producto::class)->find($data['producto']);
+                if ($producto) {
+                    $presupuesto->setProducto($producto);
+                } else {
+                    $presupuesto->setProducto(null);
+                }
             }
             
             // Validar entidad principal
@@ -391,6 +497,46 @@ class PresupuestoRepository extends ServiceEntityRepository
                 $pieza->setHoras($piezaData['horas'] ?? 0);
                 $pieza->setMinutos($piezaData['minutos'] ?? 0);
                 $pieza->setPrecioMaterial($piezaData['precioMaterial'] ?? 0);
+                
+                // Actualizar nuevas propiedades de pieza
+                if (isset($piezaData['tipo'])) {
+                    $pieza->setTipo($piezaData['tipo']);
+                }
+                
+                if (isset($piezaData['cantidad'])) {
+                    $pieza->setCantidad((int) $piezaData['cantidad']);
+                }
+                
+                // Actualizar relaciones
+                if (isset($piezaData['producto'])) {
+                    $producto = $em->getRepository(Producto::class)
+                        ->find($piezaData['producto']);
+                    if ($producto) {
+                        $pieza->setProducto($producto);
+                    } else {
+                        $pieza->setProducto(null);
+                    }
+                }
+                
+                if (isset($piezaData['activo'])) {
+                    $activo = $em->getRepository(Activo::class)
+                        ->find($piezaData['activo']);
+                    if ($activo) {
+                        $pieza->setActivo($activo);
+                    } else {
+                        $pieza->setActivo(null);
+                    }
+                }
+                
+                if (isset($piezaData['maquina'])) {
+                    $maquina = $em->getRepository(Activo::class)
+                        ->find($piezaData['maquina']);
+                    if ($maquina) {
+                        $pieza->setMaquina($maquina);
+                    } else {
+                        $pieza->setMaquina(null);
+                    }
+                }
                 
                 // Actualizar campos de auditoría
                 $currentUser = $em->getRepository(User::class)

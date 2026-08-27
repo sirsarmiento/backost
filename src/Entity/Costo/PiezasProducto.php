@@ -2,13 +2,13 @@
 
 namespace App\Entity\Costo;
 
-use App\Repository\Costo\PiezasRepository;
+use App\Repository\Costo\PiezasProductoRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Entity(repositoryClass=PiezasRepository::class)
+ * @ORM\Entity(repositoryClass=PiezasProductoRepository::class)
  */
-class Piezas
+class PiezasProducto
 {
     /**
      * @ORM\Id
@@ -53,11 +53,6 @@ class Piezas
     private $updateBy;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Presupuesto::class, inversedBy="piezas")
-     */
-    private $presupuesto;
-
-    /**
      * @ORM\Column(type="decimal", precision=10, scale=2)
      */
     private $precioMaterial;
@@ -73,17 +68,17 @@ class Piezas
     private $cantidad;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Producto::class, inversedBy="piezas")
+     * @ORM\ManyToOne(targetEntity=Producto::class, inversedBy="PiezasProducto")
      */
     private $producto;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Activo::class, inversedBy="piezas")
+     * @ORM\ManyToOne(targetEntity=Activo::class)
      */
     private $activo;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Activo::class, inversedBy="piezasMaquina")
+     * @ORM\ManyToOne(targetEntity=Activo::class)
      */
     private $maquina;
 
@@ -172,18 +167,6 @@ class Piezas
     public function setUpdateBy(?string $updateBy): self
     {
         $this->updateBy = $updateBy;
-
-        return $this;
-    }
-
-    public function getPresupuesto(): ?Presupuesto
-    {
-        return $this->presupuesto;
-    }
-
-    public function setPresupuesto(?Presupuesto $presupuesto): self
-    {
-        $this->presupuesto = $presupuesto;
 
         return $this;
     }
