@@ -148,6 +148,7 @@ class ActivoRepository extends ServiceEntityRepository
                     'fechaCompra' => $activo->getFechaCompra() ? $activo->getFechaCompra()->format('Y-m-d') : null,
                     'tipo' => $activo->getTipo(),
                     'cantidad' => $activo->getCantidad(),
+                    'cantidadReservada' => $activo->getCantidadReservada(),
                     'unidadMedida' => $activo->getUnidadMedida(),
                     'presentacion' => $activo->getPresentacion(),
                     'descripcion' => $activo->getDescripcion(),

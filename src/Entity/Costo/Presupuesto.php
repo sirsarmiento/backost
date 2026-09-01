@@ -126,6 +126,11 @@ class Presupuesto
      */
     private $total;
 
+    /**
+     * @ORM\Column(type="string", length=30, options={"default": "borrador"})
+     */
+    private $estado = 'borrador';
+
     public function __construct()
     {
         $this->createAt = new \DateTime();
@@ -133,6 +138,7 @@ class Presupuesto
         $this->updateAt = null; // Initially no updates
         $this->updateBy = null; // Initially no updates
         $this->piezas = new ArrayCollection();
+        $this->estado = 'borrador';
     }
 
     public function getId(): ?int
@@ -406,6 +412,18 @@ class Presupuesto
     public function setTotal(string $total): self
     {
         $this->total = $total;
+
+        return $this;
+    }
+
+    public function getEstado(): ?string
+    {
+        return $this->estado ?: 'borrador';
+    }
+
+    public function setEstado(string $estado): self
+    {
+        $this->estado = $estado;
 
         return $this;
     }

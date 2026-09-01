@@ -15,6 +15,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Security\Core\Security;
 use App\Entity\Empresa;
 Use App\Entity\User;
+use App\Service\InventarioService;
 
 /**
  * @method Presupuesto|null find($id, $lockMode = null, $lockVersion = null)
@@ -24,9 +25,13 @@ Use App\Entity\User;
  */
 class PresupuestoRepository extends ServiceEntityRepository
 {
-    public function __construct(ManagerRegistry $registry, Security $security)
+    private $security;
+    private $inventario;
+
+    public function __construct(ManagerRegistry $registry, Security $security, InventarioService $inventario)
     {
         $this->security = $security;
+        $this->inventario = $inventario;
         parent::__construct($registry, Presupuesto::class);
     }
 
@@ -144,6 +149,7 @@ class PresupuestoRepository extends ServiceEntityRepository
             
             $entity->setCreateBy($currentUser->getUserName());
             $entity->setCreateAt(new \DateTime());
+            $entity->setEstado($data['estado'] ?? 'borrador');
             
             // Asignar empresa si es necesario
             if (method_exists($entity, 'setEmpresa')) {
@@ -175,6 +181,8 @@ class PresupuestoRepository extends ServiceEntityRepository
 
             // Persistir y flush
             $entityManager->persist($entity);
+            $entityManager->flush();
+            $this->inventario->recalcularReservas();
             $entityManager->flush();
 
             return new JsonResponse([
@@ -322,6 +330,7 @@ class PresupuestoRepository extends ServiceEntityRepository
                     'cantidadGlobal' => $presupuesto->getCantidadGlobal(),
                     'delivery' => $presupuesto->getDelivery(),
                     'total' => $presupuesto->getTotal(), // Agregar campo total
+                    'estado' => $presupuesto->getEstado(),
                     'cliente' => $presupuesto->getCliente() ? $presupuesto->getCliente()->getId() : null,
                     'producto' => $presupuesto->getProducto() ? $presupuesto->getProducto()->getId() : null,
                     'piezas' => $piezas
@@ -412,6 +421,10 @@ class PresupuestoRepository extends ServiceEntityRepository
                 $presupuesto->setTotal((float) $data['total']);
             }
 
+            if (isset($data['estado'])) {
+                $presupuesto->setEstado($data['estado']);
+            }
+
             if (isset($data['cliente'])) {
                 $cliente = $entityManager->getRepository(Cliente::class)->find($data['cliente']);
                 if ($cliente) {
@@ -459,6 +472,8 @@ class PresupuestoRepository extends ServiceEntityRepository
             }
             
             // Persistir y flush
+            $entityManager->flush();
+            $this->inventario->recalcularReservas();
             $entityManager->flush();
             
             return new JsonResponse([

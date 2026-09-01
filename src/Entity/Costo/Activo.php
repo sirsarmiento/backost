@@ -106,6 +106,11 @@ class Activo
     private $cantidad;
 
     /**
+     * @ORM\Column(type="decimal", precision=10, scale=2, options={"default": 0})
+     */
+    private $cantidadReservada = 0;
+
+    /**
      * @ORM\Column(type="string", length=100, nullable=true)
      */
     private $unidadMedida;
@@ -355,6 +360,18 @@ class Activo
     public function setCantidad(string $cantidad): self
     {
         $this->cantidad = $cantidad;
+
+        return $this;
+    }
+
+    public function getCantidadReservada(): ?string
+    {
+        return $this->cantidadReservada !== null ? (string) $this->cantidadReservada : '0';
+    }
+
+    public function setCantidadReservada($cantidadReservada): self
+    {
+        $this->cantidadReservada = $cantidadReservada;
 
         return $this;
     }

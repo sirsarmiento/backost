@@ -15,6 +15,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Security\Core\Security;
 use App\Entity\Empresa;
 use App\Entity\User;
+use App\Service\InventarioService;
 
 /**
  * @method Producto|null find($id, $lockMode = null, $lockVersion = null)
@@ -24,9 +25,13 @@ use App\Entity\User;
  */
 class ProductoRepository extends ServiceEntityRepository
 {
-    public function __construct(ManagerRegistry $registry, Security $security)
+    private $security;
+    private $inventario;
+
+    public function __construct(ManagerRegistry $registry, Security $security, InventarioService $inventario)
     {
         $this->security = $security;
+        $this->inventario = $inventario;
         parent::__construct($registry, Producto::class);
     }
 
@@ -161,6 +166,9 @@ class ProductoRepository extends ServiceEntityRepository
                 // Flush para guardar las piezas
                 $entityManager->flush();
             }
+
+            $this->inventario->recalcularReservas();
+            $entityManager->flush();
 
             return new JsonResponse([
                 'success' => true,
@@ -318,6 +326,7 @@ class ProductoRepository extends ServiceEntityRepository
                     'tiempoSetup' => $producto->getTiempoSetup(),
                     'postProcesado' => $producto->getPostProcesado(),
                     'margenGanancia' => $producto->getMargenGanancia(),
+                    'cantidadStock' => $producto->getCantidadStock(),
                     'empresa' => $producto->getEmpresa() ? $producto->getEmpresa()->getId() : null,
                     'createAt' => $producto->getCreateAt() ? $producto->getCreateAt()->format('Y-m-d H:i:s') : null,
                     'createBy' => $producto->getCreateBy(),
@@ -425,6 +434,8 @@ class ProductoRepository extends ServiceEntityRepository
             }
             
             // Persistir y flush
+            $entityManager->flush();
+            $this->inventario->recalcularReservas();
             $entityManager->flush();
             
             return new JsonResponse([

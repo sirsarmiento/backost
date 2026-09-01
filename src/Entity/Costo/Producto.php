@@ -106,6 +106,11 @@ class Producto
     private $margenGanancia;
 
     /**
+     * @ORM\Column(type="decimal", precision=10, scale=2, options={"default": 0})
+     */
+    private $cantidadStock = 0;
+
+    /**
      * @ORM\OneToMany(targetEntity=Piezas::class, mappedBy="producto")
      */
     private $piezas;
@@ -374,6 +379,18 @@ class Producto
     public function setMargenGanancia(string $margenGanancia): self
     {
         $this->margenGanancia = $margenGanancia;
+
+        return $this;
+    }
+
+    public function getCantidadStock(): ?string
+    {
+        return $this->cantidadStock !== null ? (string) $this->cantidadStock : '0';
+    }
+
+    public function setCantidadStock($cantidadStock): self
+    {
+        $this->cantidadStock = $cantidadStock;
 
         return $this;
     }
