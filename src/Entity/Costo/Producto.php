@@ -31,6 +31,36 @@ class Producto
     private $sku;
 
     /**
+     * @ORM\Column(type="string", length=30, nullable=true)
+     */
+    private $codigoCatalogo;
+
+    /**
+     * @ORM\Column(type="string", length=10, nullable=true)
+     */
+    private $tecnologia;
+
+    /**
+     * @ORM\Column(type="string", length=10, nullable=true)
+     */
+    private $material;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Familia::class)
+     */
+    private $familia;
+
+    /**
+     * @ORM\Column(type="string", length=10, nullable=true)
+     */
+    private $correlativo;
+
+    /**
+     * @ORM\Column(type="string", length=5, nullable=true)
+     */
+    private $serie;
+
+    /**
      * @ORM\Column(type="string", length=50)
      */
     private $medida;
@@ -163,6 +193,78 @@ class Producto
     public function setSku(?string $sku): self
     {
         $this->sku = $sku;
+
+        return $this;
+    }
+
+    public function getCodigoCatalogo(): ?string
+    {
+        return $this->codigoCatalogo;
+    }
+
+    public function setCodigoCatalogo(?string $codigoCatalogo): self
+    {
+        $this->codigoCatalogo = $codigoCatalogo;
+
+        return $this;
+    }
+
+    public function getTecnologia(): ?string
+    {
+        return $this->tecnologia;
+    }
+
+    public function setTecnologia(?string $tecnologia): self
+    {
+        $this->tecnologia = $tecnologia;
+
+        return $this;
+    }
+
+    public function getMaterial(): ?string
+    {
+        return $this->material;
+    }
+
+    public function setMaterial(?string $material): self
+    {
+        $this->material = $material;
+
+        return $this;
+    }
+
+    public function getFamilia(): ?Familia
+    {
+        return $this->familia;
+    }
+
+    public function setFamilia(?Familia $familia): self
+    {
+        $this->familia = $familia;
+
+        return $this;
+    }
+
+    public function getCorrelativo(): ?string
+    {
+        return $this->correlativo;
+    }
+
+    public function setCorrelativo(?string $correlativo): self
+    {
+        $this->correlativo = $correlativo;
+
+        return $this;
+    }
+
+    public function getSerie(): ?string
+    {
+        return $this->serie;
+    }
+
+    public function setSerie(?string $serie): self
+    {
+        $this->serie = $serie;
 
         return $this;
     }

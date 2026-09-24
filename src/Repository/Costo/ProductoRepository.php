@@ -7,6 +7,8 @@ use App\Entity\Costo\PiezasProducto;
 use App\Entity\Costo\Piezas;
 use App\Entity\Costo\Activo;
 use App\Entity\Costo\Perfil;
+use App\Entity\Costo\Familia;
+use App\Service\Costo\SkuProductoService;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManagerInterface;
@@ -77,10 +79,9 @@ class ProductoRepository extends ServiceEntityRepository
             $entity->setNombre($data['nombre']);
             $entity->setMedida($data['medida']);
             $entity->setClasificacion($data['clasificacion']);
-            
-            if (isset($data['sku'])) {
-                $entity->setSku($data['sku']);
-            }
+            $this->aplicarCamposCatalogo($entity, $data, $entityManager);
+            $skuService = new SkuProductoService();
+            $skuService->asignar($entity, $entityManager, true);
             
             if (isset($data['descripcion'])) {
                 $entity->setDescripcion($data['descripcion']);
@@ -318,6 +319,17 @@ class ProductoRepository extends ServiceEntityRepository
                     'clasificacion' => $producto->getClasificacion(),
                     'descripcion' => $producto->getDescripcion(),
                     'sku' => $producto->getSku(),
+                    'codigoCatalogo' => $producto->getCodigoCatalogo(),
+                    'tecnologia' => $producto->getTecnologia(),
+                    'material' => $producto->getMaterial(),
+                    'serie' => $producto->getSerie(),
+                    'correlativo' => $producto->getCorrelativo(),
+                    'familia' => $producto->getFamilia() ? [
+                        'id' => $producto->getFamilia()->getId(),
+                        'codigo' => $producto->getFamilia()->getCodigo(),
+                        'nombre' => $producto->getFamilia()->getNombre(),
+                    ] : null,
+                    'familiaId' => $producto->getFamilia() ? $producto->getFamilia()->getId() : null,
                     'perfil' => $producto->getPerfil() ? [
                         'id' => $producto->getPerfil()->getId(),
                         'nombre' => $producto->getPerfil()->getNombre()
@@ -370,9 +382,9 @@ class ProductoRepository extends ServiceEntityRepository
             if (isset($data['clasificacion'])) {
                 $producto->setClasificacion($data['clasificacion']);
             }
-            if (isset($data['sku'])) {
-                $producto->setSku($data['sku']);
-            }
+            $this->aplicarCamposCatalogo($producto, $data, $entityManager);
+            $skuService = new SkuProductoService();
+            $skuService->asignar($producto, $entityManager, empty($producto->getSku()));
             if (isset($data['descripcion'])) {
                 $producto->setDescripcion($data['descripcion']);
             }
@@ -594,6 +606,17 @@ class ProductoRepository extends ServiceEntityRepository
                 'clasificacion' => $producto->getClasificacion(),
                 'descripcion' => $producto->getDescripcion(),
                 'sku' => $producto->getSku(),
+                'codigoCatalogo' => $producto->getCodigoCatalogo(),
+                'tecnologia' => $producto->getTecnologia(),
+                'material' => $producto->getMaterial(),
+                'serie' => $producto->getSerie(),
+                'correlativo' => $producto->getCorrelativo(),
+                'familia' => $producto->getFamilia() ? [
+                    'id' => $producto->getFamilia()->getId(),
+                    'codigo' => $producto->getFamilia()->getCodigo(),
+                    'nombre' => $producto->getFamilia()->getNombre(),
+                ] : null,
+                'familiaId' => $producto->getFamilia() ? $producto->getFamilia()->getId() : null,
                 'perfil' => $producto->getPerfil() ? [
                     'id' => $producto->getPerfil()->getId(),
                     'nombre' => $producto->getPerfil()->getNombre()
@@ -617,6 +640,38 @@ class ProductoRepository extends ServiceEntityRepository
                 'success' => false,
                 'error' => 'Error al obtener el producto: ' . $e->getMessage()
             ];
+        }
+    }
+
+    private function aplicarCamposCatalogo(Producto $entity, array $data, EntityManagerInterface $entityManager): void
+    {
+        if (array_key_exists('tecnologia', $data)) {
+            $valor = trim((string) $data['tecnologia']);
+            $entity->setTecnologia($valor !== '' ? strtoupper($valor) : null);
+        }
+        if (array_key_exists('material', $data)) {
+            $valor = trim((string) $data['material']);
+            $entity->setMaterial($valor !== '' ? strtoupper($valor) : null);
+        }
+        if (array_key_exists('serie', $data)) {
+            $valor = trim((string) $data['serie']);
+            $entity->setSerie($valor !== '' ? strtoupper($valor) : null);
+        }
+
+        $famId = null;
+        if (array_key_exists('familiaId', $data)) {
+            $famId = $data['familiaId'];
+        } elseif (array_key_exists('familia', $data)) {
+            $famId = is_array($data['familia']) ? ($data['familia']['id'] ?? null) : $data['familia'];
+        }
+
+        if ($famId !== null) {
+            if ($famId === '' || $famId === 0 || $famId === '0') {
+                $entity->setFamilia(null);
+            } else {
+                $familia = $entityManager->getRepository(Familia::class)->find((int) $famId);
+                $entity->setFamilia($familia ?: null);
+            }
         }
     }
 }
