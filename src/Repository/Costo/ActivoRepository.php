@@ -157,6 +157,7 @@ class ActivoRepository extends ServiceEntityRepository
                     // Propiedades faltantes agregadas:
                     'categoria' => $activo->getCategoria(),
                     'subCategoria' => $activo->getSubCategoria(),
+                    'tecnologia' => $activo->getTecnologia(),
                     'consumoMaquina' => $activo->getConsumoMaquina(),
                     'tarifa' => $activo->getTarifa(),
                     'costoMantenimiento' => $activo->getCostoMantenimiento(),

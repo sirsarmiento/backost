@@ -81,6 +81,11 @@ class Activo
     private $subCategoria;
 
     /**
+     * @ORM\Column(type="string", length=10, nullable=true)
+     */
+    private $tecnologia;
+
+    /**
      * @ORM\Column(type="decimal", precision=10, scale=2)
      */
     private $consumoMaquina;
@@ -300,6 +305,18 @@ class Activo
     public function setSubCategoria(?string $subCategoria): self
     {
         $this->subCategoria = $subCategoria;
+
+        return $this;
+    }
+
+    public function getTecnologia(): ?string
+    {
+        return $this->tecnologia;
+    }
+
+    public function setTecnologia(?string $tecnologia): self
+    {
+        $this->tecnologia = $tecnologia ? strtoupper(trim($tecnologia)) : null;
 
         return $this;
     }
