@@ -99,6 +99,9 @@ class ProductoRepository extends ServiceEntityRepository
             } else {
                 $entity->setTiempoSetup(0.00);
             }
+
+            $entity->setHorasImpresion((int) ($data['horasImpresion'] ?? 0));
+            $entity->setMinutosImpresion((int) ($data['minutosImpresion'] ?? 0));
             
             if (isset($data['postProcesado'])) {
                 $entity->setPostProcesado((float) $data['postProcesado']);
@@ -215,13 +218,8 @@ class ProductoRepository extends ServiceEntityRepository
                 $piezaProducto->setMetros((float) $piezaData['metros']);
             }
             
-            if (isset($piezaData['horas'])) {
-                $piezaProducto->setHoras((int) $piezaData['horas']);
-            }
-            
-            if (isset($piezaData['minutos'])) {
-                $piezaProducto->setMinutos((int) $piezaData['minutos']);
-            }
+            $piezaProducto->setHoras(0);
+            $piezaProducto->setMinutos(0);
             
             if (isset($piezaData['precioMaterial'])) {
                 $piezaProducto->setPrecioMaterial((float) $piezaData['precioMaterial']);
@@ -336,6 +334,8 @@ class ProductoRepository extends ServiceEntityRepository
                     ] : null,
                     'tasaFallo' => $producto->getTasaFallo(),
                     'tiempoSetup' => $producto->getTiempoSetup(),
+                    'horasImpresion' => $producto->getHorasImpresion(),
+                    'minutosImpresion' => $producto->getMinutosImpresion(),
                     'postProcesado' => $producto->getPostProcesado(),
                     'margenGanancia' => $producto->getMargenGanancia(),
                     'cantidadStock' => $producto->getCantidadStock(),
@@ -396,6 +396,13 @@ class ProductoRepository extends ServiceEntityRepository
             
             if (isset($data['tiempoSetup'])) {
                 $producto->setTiempoSetup((float) $data['tiempoSetup']);
+            }
+
+            if (array_key_exists('horasImpresion', $data)) {
+                $producto->setHorasImpresion((int) $data['horasImpresion']);
+            }
+            if (array_key_exists('minutosImpresion', $data)) {
+                $producto->setMinutosImpresion((int) $data['minutosImpresion']);
             }
             
             if (isset($data['postProcesado'])) {
@@ -498,6 +505,17 @@ class ProductoRepository extends ServiceEntityRepository
                 // Actualizar datos de PiezasProducto
                 if (isset($piezaData['cantidad'])) {
                     $piezasProducto->setCantidad((int) $piezaData['cantidad']);
+                }
+                $piezasProducto->setHoras(0);
+                $piezasProducto->setMinutos(0);
+                if (isset($piezaData['nombre'])) {
+                    $piezasProducto->setNombre($piezaData['nombre']);
+                }
+                if (isset($piezaData['gramos'])) {
+                    $piezasProducto->setGramos((float) $piezaData['gramos']);
+                }
+                if (isset($piezaData['tipo'])) {
+                    $piezasProducto->setTipo($piezaData['tipo']);
                 }
                 
                 // Actualizar relación con Piezas
@@ -623,6 +641,8 @@ class ProductoRepository extends ServiceEntityRepository
                 ] : null,
                 'tasaFallo' => $producto->getTasaFallo(),
                 'tiempoSetup' => $producto->getTiempoSetup(),
+                'horasImpresion' => $producto->getHorasImpresion(),
+                'minutosImpresion' => $producto->getMinutosImpresion(),
                 'postProcesado' => $producto->getPostProcesado(),
                 'margenGanancia' => $producto->getMargenGanancia(),
                 'empresa' => $producto->getEmpresa() ? $producto->getEmpresa()->getId() : null,

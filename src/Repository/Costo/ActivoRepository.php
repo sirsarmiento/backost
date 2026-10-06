@@ -158,6 +158,8 @@ class ActivoRepository extends ServiceEntityRepository
                     'categoria' => $activo->getCategoria(),
                     'subCategoria' => $activo->getSubCategoria(),
                     'tecnologia' => $activo->getTecnologia(),
+                    'marca' => $activo->getMarca(),
+                    'color' => $activo->getColor(),
                     'consumoMaquina' => $activo->getConsumoMaquina(),
                     'tarifa' => $activo->getTarifa(),
                     'costoMantenimiento' => $activo->getCostoMantenimiento(),

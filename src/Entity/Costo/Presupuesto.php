@@ -92,6 +92,16 @@ class Presupuesto
     private $tiempoSetup;
 
     /**
+     * @ORM\Column(type="integer", options={"default": 0})
+     */
+    private $horasImpresion = 0;
+
+    /**
+     * @ORM\Column(type="integer", options={"default": 0})
+     */
+    private $minutosImpresion = 0;
+
+    /**
      * @ORM\Column(type="decimal", precision=10, scale=2, nullable=true)
      */
     private $margenGanancia;
@@ -328,6 +338,30 @@ class Presupuesto
     public function setTiempoSetup(?int $tiempoSetup): self
     {
         $this->tiempoSetup = $tiempoSetup;
+
+        return $this;
+    }
+
+    public function getHorasImpresion(): ?int
+    {
+        return $this->horasImpresion;
+    }
+
+    public function setHorasImpresion(?int $horasImpresion): self
+    {
+        $this->horasImpresion = $horasImpresion ?? 0;
+
+        return $this;
+    }
+
+    public function getMinutosImpresion(): ?int
+    {
+        return $this->minutosImpresion;
+    }
+
+    public function setMinutosImpresion(?int $minutosImpresion): self
+    {
+        $this->minutosImpresion = $minutosImpresion ?? 0;
 
         return $this;
     }

@@ -86,6 +86,16 @@ class Activo
     private $tecnologia;
 
     /**
+     * @ORM\Column(type="string", length=100, nullable=true)
+     */
+    private $marca;
+
+    /**
+     * @ORM\Column(type="string", length=100, nullable=true)
+     */
+    private $color;
+
+    /**
      * @ORM\Column(type="decimal", precision=10, scale=2)
      */
     private $consumoMaquina;
@@ -317,6 +327,28 @@ class Activo
     public function setTecnologia(?string $tecnologia): self
     {
         $this->tecnologia = $tecnologia ? strtoupper(trim($tecnologia)) : null;
+        return $this;
+    }
+
+    public function getMarca(): ?string
+    {
+        return $this->marca;
+    }
+
+    public function setMarca(?string $marca): self
+    {
+        $this->marca = $marca ? trim($marca) : null;
+        return $this;
+    }
+
+    public function getColor(): ?string
+    {
+        return $this->color;
+    }
+
+    public function setColor(?string $color): self
+    {
+        $this->color = $color ? trim($color) : null;
 
         return $this;
     }

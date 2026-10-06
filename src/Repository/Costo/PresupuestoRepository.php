@@ -100,6 +100,9 @@ class PresupuestoRepository extends ServiceEntityRepository
             if (isset($data['tiempoSetup'])) {
                 $entity->setTiempoSetup((int) $data['tiempoSetup']);
             }
+
+            $entity->setHorasImpresion((int) ($data['horasImpresion'] ?? 0));
+            $entity->setMinutosImpresion((int) ($data['minutosImpresion'] ?? 0));
             
             if (isset($data['margenGanancia'])) {
                 $entity->setMargenGanancia((float) $data['margenGanancia']);
@@ -207,7 +210,7 @@ class PresupuestoRepository extends ServiceEntityRepository
     {
         foreach ($piezasData as $piezaData) {
             // Validar campos requeridos para pieza
-            $requiredPiezaFields = ['nombre', 'gramos', 'metros', 'horas', 'minutos', 'precioMaterial'];
+            $requiredPiezaFields = ['nombre', 'gramos', 'precioMaterial'];
             foreach ($requiredPiezaFields as $field) {
                 if (!isset($piezaData[$field])) {
                     throw new \InvalidArgumentException("El campo '$field' es requerido para cada pieza");
@@ -218,9 +221,9 @@ class PresupuestoRepository extends ServiceEntityRepository
             $pieza = new Piezas();
             $pieza->setNombre($piezaData['nombre']);
             $pieza->setGramos((float) $piezaData['gramos']);
-            $pieza->setMetros((float) $piezaData['metros']);
-            $pieza->setHoras((int) $piezaData['horas']);
-            $pieza->setMinutos((int) $piezaData['minutos']);
+            $pieza->setMetros((float) ($piezaData['metros'] ?? 0));
+            $pieza->setHoras(0);
+            $pieza->setMinutos(0);
             $pieza->setPrecioMaterial((float) $piezaData['precioMaterial']);
             $pieza->setPresupuesto($presupuesto);
             
@@ -325,6 +328,8 @@ class PresupuestoRepository extends ServiceEntityRepository
                     'costoMaquina' => $presupuesto->getCostoMaquina(),
                     'tasaFalloGlobal' => $presupuesto->getTasaFalloGlobal(),
                     'tiempoSetup' => $presupuesto->getTiempoSetup(),
+                    'horasImpresion' => $presupuesto->getHorasImpresion(),
+                    'minutosImpresion' => $presupuesto->getMinutosImpresion(),
                     'margenGanancia' => $presupuesto->getMargenGanancia(),
                     'tiempoPostProcesado' => $presupuesto->getTiempoPostProcesado(),
                     'cantidadGlobal' => $presupuesto->getCantidadGlobal(),
@@ -398,6 +403,13 @@ class PresupuestoRepository extends ServiceEntityRepository
             
             if (isset($data['tiempoSetup'])) {
                 $presupuesto->setTiempoSetup((int) $data['tiempoSetup']);
+            }
+
+            if (array_key_exists('horasImpresion', $data)) {
+                $presupuesto->setHorasImpresion((int) $data['horasImpresion']);
+            }
+            if (array_key_exists('minutosImpresion', $data)) {
+                $presupuesto->setMinutosImpresion((int) $data['minutosImpresion']);
             }
             
             if (isset($data['margenGanancia'])) {
@@ -520,8 +532,8 @@ class PresupuestoRepository extends ServiceEntityRepository
                 $pieza->setNombre($piezaData['nombre'] ?? null);
                 $pieza->setGramos($piezaData['gramos'] ?? 0);
                 $pieza->setMetros($piezaData['metros'] ?? 0);
-                $pieza->setHoras($piezaData['horas'] ?? 0);
-                $pieza->setMinutos($piezaData['minutos'] ?? 0);
+                $pieza->setHoras(0);
+                $pieza->setMinutos(0);
                 $pieza->setPrecioMaterial($piezaData['precioMaterial'] ?? 0);
                 
                 // Actualizar nuevas propiedades de pieza
