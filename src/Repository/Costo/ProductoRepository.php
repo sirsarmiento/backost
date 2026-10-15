@@ -102,6 +102,8 @@ class ProductoRepository extends ServiceEntityRepository
 
             $entity->setHorasImpresion((int) ($data['horasImpresion'] ?? 0));
             $entity->setMinutosImpresion((int) ($data['minutosImpresion'] ?? 0));
+            $entity->setMultitecnologia(!empty($data['multitecnologia']));
+            $entity->setTasasFallo(isset($data['tasasFallo']) ? (string) $data['tasasFallo'] : null);
             
             if (isset($data['postProcesado'])) {
                 $entity->setPostProcesado((float) $data['postProcesado']);
@@ -218,8 +220,11 @@ class ProductoRepository extends ServiceEntityRepository
                 $piezaProducto->setMetros((float) $piezaData['metros']);
             }
             
-            $piezaProducto->setHoras(0);
-            $piezaProducto->setMinutos(0);
+            $piezaProducto->setHoras((int) ($piezaData['horas'] ?? 0));
+            $piezaProducto->setMinutos((int) ($piezaData['minutos'] ?? 0));
+            if (isset($piezaData['tecnologia'])) {
+                $piezaProducto->setTecnologia((string) $piezaData['tecnologia']);
+            }
             
             if (isset($piezaData['precioMaterial'])) {
                 $piezaProducto->setPrecioMaterial((float) $piezaData['precioMaterial']);
@@ -286,6 +291,7 @@ class ProductoRepository extends ServiceEntityRepository
                             'minutos' => $piezasProducto->getMinutos(),
                             'precioMaterial' => $piezasProducto->getPrecioMaterial(),
                             'tipo' => $piezasProducto->getTipo(),
+                            'tecnologia' => $piezasProducto->getTecnologia(),
                         ];
                         
                         // Obtener datos del activo relacionado si existe
@@ -333,6 +339,8 @@ class ProductoRepository extends ServiceEntityRepository
                         'nombre' => $producto->getPerfil()->getNombre()
                     ] : null,
                     'tasaFallo' => $producto->getTasaFallo(),
+                    'multitecnologia' => $producto->getMultitecnologia(),
+                    'tasasFallo' => $producto->getTasasFallo(),
                     'tiempoSetup' => $producto->getTiempoSetup(),
                     'horasImpresion' => $producto->getHorasImpresion(),
                     'minutosImpresion' => $producto->getMinutosImpresion(),
@@ -403,6 +411,12 @@ class ProductoRepository extends ServiceEntityRepository
             }
             if (array_key_exists('minutosImpresion', $data)) {
                 $producto->setMinutosImpresion((int) $data['minutosImpresion']);
+            }
+            if (array_key_exists('multitecnologia', $data)) {
+                $producto->setMultitecnologia((bool) $data['multitecnologia']);
+            }
+            if (array_key_exists('tasasFallo', $data)) {
+                $producto->setTasasFallo($data['tasasFallo'] !== null && $data['tasasFallo'] !== '' ? (string) $data['tasasFallo'] : null);
             }
             
             if (isset($data['postProcesado'])) {
@@ -506,8 +520,11 @@ class ProductoRepository extends ServiceEntityRepository
                 if (isset($piezaData['cantidad'])) {
                     $piezasProducto->setCantidad((int) $piezaData['cantidad']);
                 }
-                $piezasProducto->setHoras(0);
-                $piezasProducto->setMinutos(0);
+                $piezasProducto->setHoras((int) ($piezaData['horas'] ?? 0));
+                $piezasProducto->setMinutos((int) ($piezaData['minutos'] ?? 0));
+                if (isset($piezaData['tecnologia'])) {
+                    $piezasProducto->setTecnologia((string) $piezaData['tecnologia']);
+                }
                 if (isset($piezaData['nombre'])) {
                     $piezasProducto->setNombre($piezaData['nombre']);
                 }
@@ -591,6 +608,7 @@ class ProductoRepository extends ServiceEntityRepository
                         'minutos' => $piezasProducto->getMinutos(),
                         'precioMaterial' => $piezasProducto->getPrecioMaterial(),
                         'tipo' => $piezasProducto->getTipo(),
+                        'tecnologia' => $piezasProducto->getTecnologia(),
                     ];
                     
                     // Obtener datos del activo relacionado si existe
@@ -640,6 +658,8 @@ class ProductoRepository extends ServiceEntityRepository
                     'nombre' => $producto->getPerfil()->getNombre()
                 ] : null,
                 'tasaFallo' => $producto->getTasaFallo(),
+                'multitecnologia' => $producto->getMultitecnologia(),
+                'tasasFallo' => $producto->getTasasFallo(),
                 'tiempoSetup' => $producto->getTiempoSetup(),
                 'horasImpresion' => $producto->getHorasImpresion(),
                 'minutosImpresion' => $producto->getMinutosImpresion(),

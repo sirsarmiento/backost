@@ -43,37 +43,93 @@ class SkuProductoService
     public function categoriaDesdeClasificacion(?string $clasificacion): string
     {
         $valor = strtolower(trim((string) $clasificacion));
-        if (in_array($valor, ['producto', 'productos', 'producto final', 'producto fabricado'], true)) {
+        if (in_array($valor, ['producto', 'productos', 'producto final', 'producto fabricado', 'pf'], true)) {
             return 'PF';
+        }
+        if (in_array($valor, ['proyecto', 'proyectos', 'pr', 'py', 'p'], true)) {
+            return 'P';
         }
 
         return 'SR';
     }
 
+    /**
+     * @return array{0: string[], 1: string[]}
+     */
+    public function partesDesdeTexto(?string $tecnologia, ?string $material): array
+    {
+        $tecnologias = $this->partirValores($tecnologia);
+        $materiales = $this->partirValores($material);
+
+        return [$tecnologias, $materiales];
+    }
+
+    public function armarSegmentoTecnologia(array $tecnologias): string
+    {
+        $tecnologias = $this->partirValores(implode('/', $tecnologias));
+        if (count($tecnologias) > 1) {
+            return 'M-' . implode('/', $tecnologias);
+        }
+
+        return $tecnologias[0] ?? '';
+    }
+
+    public function armarSegmentoMaterial(array $materiales): string
+    {
+        $materiales = $this->partirValores(implode('/', $materiales));
+
+        return implode('/', $materiales);
+    }
+
     public function asignar(Producto $producto, EntityManagerInterface $em, bool $forzar = false): void
     {
-        $tecnologia = strtoupper(trim((string) $producto->getTecnologia()));
-        $material = strtoupper(trim((string) $producto->getMaterial()));
+        [$tecnologias, $materiales] = $this->partesDesdeTexto($producto->getTecnologia(), $producto->getMaterial());
+        $segmentoTec = $this->armarSegmentoTecnologia($tecnologias);
+        $segmentoMat = $this->armarSegmentoMaterial($materiales);
         $familia = $producto->getFamilia() ? strtoupper(trim((string) $producto->getFamilia()->getCodigo())) : '';
+        $categoria = $this->categoriaDesdeClasificacion($producto->getClasificacion());
+        $esProyecto = $categoria === 'P';
 
-        if ($tecnologia === '' || $material === '' || $familia === '') {
+        if ($segmentoTec === '') {
+            return;
+        }
+        if (!$esProyecto && ($segmentoMat === '' || $familia === '')) {
             return;
         }
 
-        $categoria = $this->categoriaDesdeClasificacion($producto->getClasificacion());
-        $correlativo = $this->resolverCorrelativo($producto, $em, $categoria, $tecnologia, $material, $familia, $forzar);
+        $correlativo = $this->resolverCorrelativo($producto, $em, $familia, $forzar);
 
         $producto->setCorrelativo($correlativo);
-        $producto->setSku(sprintf('%s-%s-%s-%s-%s', $categoria, $tecnologia, $material, $familia, $correlativo));
+        if ($esProyecto) {
+            $producto->setSku(sprintf('P-%s-%s', $correlativo, implode('/', $tecnologias)));
+            $producto->setCodigoCatalogo(sprintf('P-%s', $correlativo));
+            return;
+        }
+
+        $producto->setSku(sprintf('%s-%s-%s-%s-%s', $categoria, $segmentoTec, $segmentoMat, $familia, $correlativo));
         $producto->setCodigoCatalogo(sprintf('%s-%s', $familia, $correlativo));
+    }
+
+    private function partirValores(?string $valor): array
+    {
+        $partes = preg_split('/[\\/,|-]+/', strtoupper(trim((string) $valor))) ?: [];
+        $limpios = [];
+        foreach ($partes as $parte) {
+            $parte = trim($parte);
+            if ($parte === '' || $parte === 'M') {
+                continue;
+            }
+            if (!in_array($parte, $limpios, true)) {
+                $limpios[] = $parte;
+            }
+        }
+
+        return $limpios;
     }
 
     private function resolverCorrelativo(
         Producto $producto,
         EntityManagerInterface $em,
-        string $categoria,
-        string $tecnologia,
-        string $material,
         string $familia,
         bool $forzar
     ): string {
@@ -90,7 +146,7 @@ class SkuProductoService
         }
 
         $clasificacion = strtolower(trim((string) $producto->getClasificacion()));
-        $esProyecto = in_array($clasificacion, ['proyecto', 'proyectos'], true);
+        $esProyecto = in_array($clasificacion, ['proyecto', 'proyectos', 'pr', 'py', 'p'], true);
         $serie = strtoupper(trim((string) $producto->getSerie()));
 
         if ($esProyecto) {
@@ -101,7 +157,7 @@ class SkuProductoService
             return $this->siguientePrefijo($em, $producto, $familia, $serie, 2);
         }
 
-        return $this->siguienteNumerico($em, $tecnologia, $material, $familia);
+        return $this->siguienteNumerico($em, $familia);
     }
 
     private function correlativoLibre(EntityManagerInterface $em, string $correlativo, ?int $ignorarId): bool
@@ -120,15 +176,17 @@ class SkuProductoService
 
     private function siguientePrefijo(EntityManagerInterface $em, Producto $producto, string $familia, string $prefijo, int $digitos): string
     {
-        $existentes = $em->getRepository(Producto::class)->createQueryBuilder('p')
+        $qb = $em->getRepository(Producto::class)->createQueryBuilder('p')
             ->select('p.correlativo')
             ->leftJoin('p.familia', 'f')
-            ->where('UPPER(f.codigo) = :fam')
-            ->andWhere('p.correlativo LIKE :pref')
-            ->setParameter('fam', $familia)
-            ->setParameter('pref', $prefijo . '%')
-            ->getQuery()
-            ->getScalarResult();
+            ->where('p.correlativo LIKE :pref')
+            ->setParameter('pref', $prefijo . '%');
+
+        if ($familia !== '') {
+            $qb->andWhere('UPPER(f.codigo) = :fam')->setParameter('fam', $familia);
+        }
+
+        $existentes = $qb->getQuery()->getScalarResult();
 
         $max = 0;
         $patron = '/^' . preg_quote($prefijo, '/') . '(\d+)$/';
@@ -145,20 +203,12 @@ class SkuProductoService
         return $prefijo . str_pad((string) ($max + 1), $digitos, '0', STR_PAD_LEFT);
     }
 
-    private function siguienteNumerico(
-        EntityManagerInterface $em,
-        string $tecnologia,
-        string $material,
-        string $familia
-    ): string {
+    private function siguienteNumerico(EntityManagerInterface $em, string $familia): string
+    {
         $existentes = $em->getRepository(Producto::class)->createQueryBuilder('p')
             ->select('p.correlativo')
             ->leftJoin('p.familia', 'f')
-            ->where('p.tecnologia = :tec')
-            ->andWhere('p.material = :mat')
-            ->andWhere('UPPER(f.codigo) = :fam')
-            ->setParameter('tec', $tecnologia)
-            ->setParameter('mat', $material)
+            ->where('UPPER(f.codigo) = :fam')
             ->setParameter('fam', $familia)
             ->getQuery()
             ->getScalarResult();

@@ -26,7 +26,7 @@ class Producto
     private $nombre;
 
     /**
-     * @ORM\Column(type="string", length=50, nullable=true)
+     * @ORM\Column(type="string", length=80, nullable=true)
      */
     private $sku;
 
@@ -36,14 +36,24 @@ class Producto
     private $codigoCatalogo;
 
     /**
-     * @ORM\Column(type="string", length=10, nullable=true)
+     * @ORM\Column(type="string", length=80, nullable=true)
      */
     private $tecnologia;
 
     /**
-     * @ORM\Column(type="string", length=10, nullable=true)
+     * @ORM\Column(type="string", length=80, nullable=true)
      */
     private $material;
+
+    /**
+     * @ORM\Column(type="boolean", options={"default": 0})
+     */
+    private $multitecnologia = false;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $tasasFallo;
 
     /**
      * @ORM\ManyToOne(targetEntity=Familia::class)
@@ -455,6 +465,30 @@ class Producto
     public function setTasaFallo(string $tasaFallo): self
     {
         $this->tasaFallo = $tasaFallo;
+
+        return $this;
+    }
+
+    public function getMultitecnologia(): bool
+    {
+        return (bool) $this->multitecnologia;
+    }
+
+    public function setMultitecnologia(?bool $multitecnologia): self
+    {
+        $this->multitecnologia = (bool) $multitecnologia;
+
+        return $this;
+    }
+
+    public function getTasasFallo(): ?string
+    {
+        return $this->tasasFallo;
+    }
+
+    public function setTasasFallo(?string $tasasFallo): self
+    {
+        $this->tasasFallo = $tasasFallo;
 
         return $this;
     }

@@ -87,6 +87,16 @@ class Presupuesto
     private $tasaFalloGlobal;
 
     /**
+     * @ORM\Column(type="boolean", options={"default": 0})
+     */
+    private $multitecnologia = false;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $tasasFallo;
+
+    /**
      * @ORM\Column(type="integer", nullable=true)
      */
     private $tiempoSetup;
@@ -326,6 +336,30 @@ class Presupuesto
     public function setTasaFalloGlobal(?string $tasaFalloGlobal): self
     {
         $this->tasaFalloGlobal = $tasaFalloGlobal;
+
+        return $this;
+    }
+
+    public function getMultitecnologia(): bool
+    {
+        return (bool) $this->multitecnologia;
+    }
+
+    public function setMultitecnologia(?bool $multitecnologia): self
+    {
+        $this->multitecnologia = (bool) $multitecnologia;
+
+        return $this;
+    }
+
+    public function getTasasFallo(): ?string
+    {
+        return $this->tasasFallo;
+    }
+
+    public function setTasasFallo(?string $tasasFallo): self
+    {
+        $this->tasasFallo = $tasasFallo;
 
         return $this;
     }

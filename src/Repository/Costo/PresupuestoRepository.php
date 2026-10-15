@@ -103,6 +103,8 @@ class PresupuestoRepository extends ServiceEntityRepository
 
             $entity->setHorasImpresion((int) ($data['horasImpresion'] ?? 0));
             $entity->setMinutosImpresion((int) ($data['minutosImpresion'] ?? 0));
+            $entity->setMultitecnologia(!empty($data['multitecnologia']));
+            $entity->setTasasFallo(isset($data['tasasFallo']) ? (string) $data['tasasFallo'] : null);
             
             if (isset($data['margenGanancia'])) {
                 $entity->setMargenGanancia((float) $data['margenGanancia']);
@@ -222,8 +224,11 @@ class PresupuestoRepository extends ServiceEntityRepository
             $pieza->setNombre($piezaData['nombre']);
             $pieza->setGramos((float) $piezaData['gramos']);
             $pieza->setMetros((float) ($piezaData['metros'] ?? 0));
-            $pieza->setHoras(0);
-            $pieza->setMinutos(0);
+            $pieza->setHoras((int) ($piezaData['horas'] ?? 0));
+            $pieza->setMinutos((int) ($piezaData['minutos'] ?? 0));
+            if (isset($piezaData['tecnologia'])) {
+                $pieza->setTecnologia((string) $piezaData['tecnologia']);
+            }
             $pieza->setPrecioMaterial((float) $piezaData['precioMaterial']);
             $pieza->setPresupuesto($presupuesto);
             
@@ -298,6 +303,7 @@ class PresupuestoRepository extends ServiceEntityRepository
                             'minutos' => $pieza->getMinutos(),
                             'precioMaterial' => $pieza->getPrecioMaterial(),
                             'tipo' => $pieza->getTipo(),
+                            'tecnologia' => $pieza->getTecnologia(),
                             'cantidad' => $pieza->getCantidad(),
                         ];
                         
@@ -327,6 +333,8 @@ class PresupuestoRepository extends ServiceEntityRepository
                     'costoOperador' => $presupuesto->getCostoOperador(),
                     'costoMaquina' => $presupuesto->getCostoMaquina(),
                     'tasaFalloGlobal' => $presupuesto->getTasaFalloGlobal(),
+                    'multitecnologia' => $presupuesto->getMultitecnologia(),
+                    'tasasFallo' => $presupuesto->getTasasFallo(),
                     'tiempoSetup' => $presupuesto->getTiempoSetup(),
                     'horasImpresion' => $presupuesto->getHorasImpresion(),
                     'minutosImpresion' => $presupuesto->getMinutosImpresion(),
@@ -410,6 +418,12 @@ class PresupuestoRepository extends ServiceEntityRepository
             }
             if (array_key_exists('minutosImpresion', $data)) {
                 $presupuesto->setMinutosImpresion((int) $data['minutosImpresion']);
+            }
+            if (array_key_exists('multitecnologia', $data)) {
+                $presupuesto->setMultitecnologia((bool) $data['multitecnologia']);
+            }
+            if (array_key_exists('tasasFallo', $data)) {
+                $presupuesto->setTasasFallo($data['tasasFallo'] !== null && $data['tasasFallo'] !== '' ? (string) $data['tasasFallo'] : null);
             }
             
             if (isset($data['margenGanancia'])) {
@@ -532,8 +546,11 @@ class PresupuestoRepository extends ServiceEntityRepository
                 $pieza->setNombre($piezaData['nombre'] ?? null);
                 $pieza->setGramos($piezaData['gramos'] ?? 0);
                 $pieza->setMetros($piezaData['metros'] ?? 0);
-                $pieza->setHoras(0);
-                $pieza->setMinutos(0);
+                $pieza->setHoras((int) ($piezaData['horas'] ?? 0));
+                $pieza->setMinutos((int) ($piezaData['minutos'] ?? 0));
+                if (isset($piezaData['tecnologia'])) {
+                    $pieza->setTecnologia((string) $piezaData['tecnologia']);
+                }
                 $pieza->setPrecioMaterial($piezaData['precioMaterial'] ?? 0);
                 
                 // Actualizar nuevas propiedades de pieza
