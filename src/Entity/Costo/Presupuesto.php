@@ -151,6 +151,11 @@ class Presupuesto
      */
     private $estado = 'borrador';
 
+    /**
+     * @ORM\Column(type="text", nullable=true)
+     */
+    private $lineas;
+
     public function __construct()
     {
         $this->createAt = new \DateTime();
@@ -492,6 +497,18 @@ class Presupuesto
     public function setEstado(string $estado): self
     {
         $this->estado = $estado;
+
+        return $this;
+    }
+
+    public function getLineas(): ?string
+    {
+        return $this->lineas;
+    }
+
+    public function setLineas(?string $lineas): self
+    {
+        $this->lineas = $lineas;
 
         return $this;
     }

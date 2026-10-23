@@ -141,6 +141,10 @@ class PresupuestoRepository extends ServiceEntityRepository
                 }
             }
 
+            if (array_key_exists('lineas', $data)) {
+                $entity->setLineas($this->codificarLineas($data['lineas']));
+            }
+
             // Obtener usuario actual
             $currentUser = $entityManager->getRepository(User::class)
                 ->find($this->security->getUser()->getId());
@@ -346,6 +350,7 @@ class PresupuestoRepository extends ServiceEntityRepository
                     'estado' => $presupuesto->getEstado(),
                     'cliente' => $presupuesto->getCliente() ? $presupuesto->getCliente()->getId() : null,
                     'producto' => $presupuesto->getProducto() ? $presupuesto->getProducto()->getId() : null,
+                    'lineas' => $this->decodificarLineas($presupuesto->getLineas()),
                     'piezas' => $piezas
                 ];
             }
@@ -467,6 +472,10 @@ class PresupuestoRepository extends ServiceEntityRepository
                 } else {
                     $presupuesto->setProducto(null);
                 }
+            }
+
+            if (array_key_exists('lineas', $data)) {
+                $presupuesto->setLineas($this->codificarLineas($data['lineas']));
             }
             
             // Validar entidad principal
@@ -623,5 +632,25 @@ class PresupuestoRepository extends ServiceEntityRepository
         foreach ($existingPiezasMap as $piezaToDelete) {
             $em->remove($piezaToDelete);
         }
+    }
+
+    private function codificarLineas($lineas): ?string
+    {
+        if ($lineas === null || $lineas === '') {
+            return null;
+        }
+        if (is_string($lineas)) {
+            return $lineas;
+        }
+        return json_encode($lineas, JSON_UNESCAPED_UNICODE);
+    }
+
+    private function decodificarLineas(?string $lineas)
+    {
+        if (!$lineas) {
+            return [];
+        }
+        $parsed = json_decode($lineas, true);
+        return is_array($parsed) ? $parsed : [];
     }
 }
