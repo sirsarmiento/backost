@@ -59,6 +59,11 @@ class Cliente
      */
     private $categoria;
 
+    /**
+     * @ORM\Column(type="text", nullable=true)
+     */
+    private $sectores;
+
     public function __construct()
     {
         $this->presupuestos = new ArrayCollection();
@@ -179,6 +184,31 @@ class Cliente
     public function setCategoria(string $categoria): self
     {
         $this->categoria = $categoria;
+
+        return $this;
+    }
+
+    public function getSectores(): ?string
+    {
+        return $this->sectores;
+    }
+
+    public function getSectoresLista(): array
+    {
+        if (!$this->sectores) {
+            return [];
+        }
+        $decodificado = json_decode($this->sectores, true);
+        return is_array($decodificado) ? $decodificado : [];
+    }
+
+    public function setSectores($sectores): self
+    {
+        if (is_array($sectores)) {
+            $this->sectores = json_encode(array_values($sectores), JSON_UNESCAPED_UNICODE);
+        } else {
+            $this->sectores = $sectores;
+        }
 
         return $this;
     }

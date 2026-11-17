@@ -166,6 +166,7 @@ class InventarioService
         $venta->setFecha(new \DateTime());
         $venta->setNumero('V-' . ($presupuesto->getNumero() ?: $presupuesto->getId()));
         $venta->setDescripcion($presupuesto->getDescripcion());
+        $venta->setEstado('PENDIENTE');
         $user = $this->currentUser();
         if ($user) {
             $venta->setCreateBy($user->getUserName());

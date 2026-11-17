@@ -51,6 +51,9 @@ class Venta
     /** @ORM\Column(type="string", length=50) */
     private $createBy;
 
+    /** @ORM\Column(type="string", length=30, options={"default": "PENDIENTE"}) */
+    private $estado = 'PENDIENTE';
+
     public function __construct()
     {
         $this->createAt = new \DateTime();
@@ -81,4 +84,6 @@ class Venta
     public function setCreateAt(\DateTimeInterface $createAt): self { $this->createAt = $createAt; return $this; }
     public function getCreateBy(): ?string { return $this->createBy; }
     public function setCreateBy(string $createBy): self { $this->createBy = $createBy; return $this; }
+    public function getEstado(): ?string { return $this->estado; }
+    public function setEstado(?string $estado): self { $this->estado = $estado ?: 'PENDIENTE'; return $this; }
 }

@@ -10,6 +10,8 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class Piezas
 {
+    use PiezaDetalleTecnologiaTrait;
+
     /**
      * @ORM\Id
      * @ORM\GeneratedValue

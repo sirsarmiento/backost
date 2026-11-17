@@ -18,6 +18,7 @@ use Symfony\Component\Security\Core\Security;
 use App\Entity\Empresa;
 use App\Entity\User;
 use App\Service\InventarioService;
+use App\Service\Costo\PiezaCamposTecnologia;
 
 /**
  * @method Producto|null find($id, $lockMode = null, $lockVersion = null)
@@ -249,6 +250,8 @@ class ProductoRepository extends ServiceEntityRepository
                     $piezaProducto->setMaquina($maquina);
                 }
             }
+
+            PiezaCamposTecnologia::aplicar($piezaProducto, $piezaData);
             
             // Validar la entidad PiezasProducto
             $errors = $validator->validate($piezaProducto);
@@ -311,6 +314,8 @@ class ProductoRepository extends ServiceEntityRepository
                                 'nombre' => $maquina->getNombre() ?? null,
                             ];
                         }
+
+                        $piezaData = array_merge($piezaData, PiezaCamposTecnologia::extraer($piezasProducto));
                         
                         $piezas[] = $piezaData;
                     }
@@ -556,6 +561,17 @@ class ProductoRepository extends ServiceEntityRepository
                         $piezasProducto->setActivo(null);
                     }
                 }
+
+                if (isset($piezaData['maquina'])) {
+                    $maquina = $em->getRepository(Activo::class)->find($piezaData['maquina']);
+                    if ($maquina) {
+                        $piezasProducto->setMaquina($maquina);
+                    } else {
+                        $piezasProducto->setMaquina(null);
+                    }
+                }
+
+                PiezaCamposTecnologia::aplicar($piezasProducto, $piezaData);
                 
                 // Validar PiezasProducto
                 $piezaErrors = $validator->validate($piezasProducto);
@@ -628,6 +644,8 @@ class ProductoRepository extends ServiceEntityRepository
                             'nombre' => $maquina->getNombre() ?? null,
                         ];
                     }
+
+                    $piezaData = array_merge($piezaData, PiezaCamposTecnologia::extraer($piezasProducto));
                     
                     $piezas[] = $piezaData;
                 }

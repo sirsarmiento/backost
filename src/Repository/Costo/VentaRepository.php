@@ -31,6 +31,8 @@ class VentaRepository extends ServiceEntityRepository
             }
             $cantidad = isset($data['cantidad']) ? (float) $data['cantidad'] : null;
             $venta = $this->inventario->aplicarVenta($presupuesto, $cantidad);
+            $estado = $data['estadoVenta'] ?? $data['estado'] ?? 'PENDIENTE';
+            $venta->setEstado(strtoupper((string) $estado));
             $this->getEntityManager()->flush();
             return new JsonResponse(['msg' => 'Venta registrada', 'id' => $venta->getId(), 'numero' => $venta->getNumero()], 201);
         } catch (\RuntimeException $e) {
@@ -51,6 +53,8 @@ class VentaRepository extends ServiceEntityRepository
                 'descripcion' => $v->getDescripcion(),
                 'cantidad' => $v->getCantidad(),
                 'total' => $v->getTotal(),
+                'estado' => $v->getEstado(),
+                'estadoVenta' => $v->getEstado(),
                 'presupuesto' => $v->getPresupuesto() ? $v->getPresupuesto()->getId() : null,
                 'cliente' => $v->getCliente() ? [
                     'id' => $v->getCliente()->getId(),

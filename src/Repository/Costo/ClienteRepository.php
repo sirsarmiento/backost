@@ -32,8 +32,13 @@ class ClienteRepository extends ServiceEntityRepository
         $entityManager = $this->getEntityManager();
 
         try {
+            $sectores = $data['sectores'] ?? null;
+            unset($data['sectores']);
             // Crear entidad principal - Cliente
             $entity = $helper->setParametersToEntity(new Cliente(), $data);
+            if ($sectores !== null) {
+                $entity->setSectores($sectores);
+            }
             
             // Validar entidad principal
             $errors = $validator->validate($entity);
@@ -82,6 +87,7 @@ class ClienteRepository extends ServiceEntityRepository
                     'direccion' => $cliente->getDireccion(),
                     'cedula' => $cliente->getCedula(),
                     'categoria' => $cliente->getCategoria(),
+                    'sectores' => $cliente->getSectoresLista(),
                 ];
             }
 
@@ -107,8 +113,13 @@ class ClienteRepository extends ServiceEntityRepository
                 return new JsonResponse(['msg' => 'Cliente no encontrado'], 404);
             }
 
+            $sectores = $data['sectores'] ?? null;
+            unset($data['sectores']);
             // Actualizar entidad principal
             $cliente = $helper->setParametersToEntity($cliente, $data);
+            if ($sectores !== null) {
+                $cliente->setSectores($sectores);
+            }
             
             // Validar entidad principal
             $errors = $validator->validate($cliente);

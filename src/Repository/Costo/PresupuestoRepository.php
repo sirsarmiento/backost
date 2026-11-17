@@ -16,6 +16,7 @@ use Symfony\Component\Security\Core\Security;
 use App\Entity\Empresa;
 Use App\Entity\User;
 use App\Service\InventarioService;
+use App\Service\Costo\PiezaCamposTecnologia;
 
 /**
  * @method Presupuesto|null find($id, $lockMode = null, $lockVersion = null)
@@ -269,6 +270,8 @@ class PresupuestoRepository extends ServiceEntityRepository
                     $pieza->setMaquina($maquina);
                 }
             }
+
+            PiezaCamposTecnologia::aplicar($pieza, $piezaData);
             
             // Validar pieza
             $errors = $validator->validate($pieza);
@@ -323,6 +326,8 @@ class PresupuestoRepository extends ServiceEntityRepository
                         if ($pieza->getMaquina()) {
                             $piezaData['maquina'] = $pieza->getMaquina()->getId();
                         }
+
+                        $piezaData = array_merge($piezaData, PiezaCamposTecnologia::extraer($pieza));
                         
                         $piezas[] = $piezaData;
                     }
@@ -601,6 +606,8 @@ class PresupuestoRepository extends ServiceEntityRepository
                         $pieza->setMaquina(null);
                     }
                 }
+
+                PiezaCamposTecnologia::aplicar($pieza, $piezaData);
                 
                 // Actualizar campos de auditoría
                 $currentUser = $em->getRepository(User::class)
